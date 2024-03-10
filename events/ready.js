@@ -10,9 +10,13 @@ module.exports = {
         console.log(`Ready! Logged in as ${client.user.tag}`);
         client.user.setActivity('Sup', { type: ActivityType.LISTENING });
 
+        console.log("Connecting to MongoDB ...")
         if (mongoURL) {
             await mongoose.connect(mongoURL)
             console.log('Connected to MongoDB');
+        }
+        else {
+            console.log("Failed to Connect to MongoDB")
         }
     },
 }
