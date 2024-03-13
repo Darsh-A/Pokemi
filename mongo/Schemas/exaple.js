@@ -1,7 +1,8 @@
 const { Schema, model } = require('mongoose');
 
-let test = new Schema({
+let user = new Schema({
     name: String,
+    id: String,
 });
 
-module.exports = model('test', test);
+module.exports = model('test78678', test);
