@@ -1,1 +1,1 @@
-{"main":"index.js","dependencies":{"discord.js":"^14.14.1","mongoose":"^8.2.1"}}
+{"main":"index.js","dependencies":{"@pkmn/data":"^0.9.0","@pkmn/dex":"^0.9.0","discord.js":"^14.12.1","mongoose":"^8.2.1","pkmonjs":"^1.6.4","pokemon-showdown":"^0.11.9"}}
