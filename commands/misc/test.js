@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const {Dex} = require('@pkmn/dex');
 const {Generations} = require('@pkmn/data');
+const {filterMovesByGen} = require('../../Utils/UtilityClasses');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,8 +10,12 @@ module.exports = {
 
     async execute(interaction) {
         
-        const gens = new Generations(Dex);
-        console.log(gens.get(8).species.get('Pikachu'));
-        
+        const gen = new Generations(Dex);
+        const output = await gen.get(8).learnsets.get('Ursaring');
+        const learnset = output.learnset;
+
+        const moves = filterMovesByGen(8,learnset);
+
+        console.log(moves);
     }
 }

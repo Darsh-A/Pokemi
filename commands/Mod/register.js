@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const UserSchema = require('../../mongo/Schemas/user');
-const Pokemon = require('../../Utils/UtilityClasses');
+const {Pokemon, getAbility, filterMovesByGen, checkMovesForScratchOrTackle, checkPokemonExists} = require('../../Utils/UtilityClasses');
+const { generateRandomString } = require('../../Utils/miscFunc.js');
 
 
 module.exports = {
@@ -28,25 +29,35 @@ module.exports = {
 
         const options = interaction.options;
         const UserID = options.getString('discordid');  
-        const StarterPokemonName = options.getString('starterpokemon');
+        const StarterPokemonSpecies = options.getString('starterpokemon');
         const StarterPokemonGeneration = options.getString('starterpokemongeneration');
+
+        const pokemonExists = checkPokemonExists(StarterPokemonGeneration, StarterPokemonSpecies);
+
+        if (!pokemonExists) return interaction.reply(`Pokemon ${StarterPokemonSpecies} Not Found in Generation ${StarterPokemonGeneration}`)
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
         if (user) return interaction.reply(`User <@${UserID}> Already Registered`)
+        
+        const moves  = filterMovesByGen(StarterPokemonGeneration, StarterPokemonSpecies);
+        const selectedAbility = getAbility(StarterPokemonGeneration, StarterPokemonSpecies)
+        const preferredMove = checkMovesForScratchOrTackle(moves);
 
         const StarterPokemon = new Pokemon(
-            "","", // Name and Gen
-            StarterPokemonName, // Species
+            "", // Name
+            StarterPokemonGeneration, // Generation
+            generateRandomString(15), // ID
+            StarterPokemonSpecies, // Species
             "", // Gender
             "", // Shiny 
             "", // Item
-            5, // Level
-            "", // Ability // IS Randomized
-            {"hp": 0, "atk": 0, "def": 0, "spa": 252, "spd": 0, "spe": 0}, // EVs
+            4, // Level
+            selectedAbility, // Ability // IS Randomized
+            {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}, // EVs
             "Quirky", // Nature
             {"hp": 31, "atk": 31, "def": 31, "spa": 31, "spd": 31, "spe": 31}, // IVs
-            ["Thunderbolt", "Volt Switch", "Hidden Power", "Focus Blast"] // Moves // IS Fetched
+            [preferredMove] // Moves // IS Fetched
         )
 
 
