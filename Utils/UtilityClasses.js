@@ -1,6 +1,7 @@
 const { Dex } = require('@pkmn/dex');
 const { Generations } = require('@pkmn/data');
 const UserSchema = require('../mongo/Schemas/user');
+const axios = require('axios');
 
 
 class Pokemon {
@@ -28,18 +29,13 @@ class Pokemon {
     }
 }
 
-module.exports.InvItem = class InvItem {
+class InvItem {
 
-    constructor(name, description, url) {
+    constructor(name, amount) {
         this.name = name;
-        this.description = description;
-        this.image = url;
+        this.amount = amount;
     }
-
-    // Add methods to access or modify properties (optional)
-    useItem() {
-        // Implement logic to use the item
-    }
+    
 }
 
 
@@ -105,7 +101,7 @@ function checkMovesForScratchOrTackle(moves) {
 
 async function getAligibleMoves(PokemonID, DiscordID) {
 
-    const user = await UserSchema.findOne({ Discord : DiscordID });
+    const user = await UserSchema.findOne({ DiscordID: DiscordID });
     if (!user) return "User Not Found";
 
     const userPokemons = user.AllPokemons;
@@ -123,19 +119,140 @@ async function getAligibleMoves(PokemonID, DiscordID) {
     const level = pokemon.level;
 
     const eligibleMoves = [];
-
     // level is the number after the L 
     for (const move in moves) {
-        const moveLevel = parseInt(move.split('L')[1]);
+        const moveLevel = parseInt(moves[move].split('L')[1]);
         if (moveLevel <= level) {
-            eligibleMoves.push(moves[move]);
+            eligibleMoves.push(move);
         }
     }
 
     return eligibleMoves;
 
+
+}
+
+async function getSprites(gen, species, shiny) {
+    const gens = new Generations(Dex);
+    const Pokemon = gens.get(gen).species.get(species);
+
+    if (!Pokemon) return "No Pokemon Found";
+
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${species.toLowerCase()}`);
+    const spriteUrl = response.data.sprites.other.showdown.front_default;
+    const shinySprite = response.data.sprites.other.showdown.front_shiny;
+
+    if (shiny) {
+        return shinySprite;
+    } else {
+        return spriteUrl;
+    }
+
+}
+
+async function getType(gen, species) {
+    const gens = new Generations(Dex);
+    const Pokemon = gens.get(gen).species.get(species);
+
+    if (!Pokemon) return "No Pokemon Found";
+
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${species.toLowerCase()}`);
+
+    const allTypes = response.data.types;
+
+    const types = [];
+
+    for (const type of allTypes) {
+        types.push(type.type.name);
+    }
     
+
+    return types;
+}
+
+async function trainPokemon(pokemonID, DiscordID, forgetmove, learnmove, MoveReplace) {
+
+    const user = await UserSchema.findOne({ DiscordID : DiscordID });
+    if (!user) return "User Not Found";
+
+    const userPokemons = user.AllPokemons;
+
+    const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID);
+    if (!pokemon) return "Pokemon Not Found";
+
+    const PokMoves = pokemon.moves;
+
+    // if the learnmove already exists in the moveset, return
+    if (PokMoves.includes(learnmove)) return "Move Already Exists";
+
+    if(learnmove === forgetmove) return "Cannot Replace with the same move";1
+
+    if (PokMoves.length === 4 && MoveReplace) {
+        const moveIndex = PokMoves.indexOf(forgetmove);
+
+        if (moveIndex === -1) return console.log("Move Not Found");
+    
+        PokMoves[moveIndex] = learnmove;
+    
+        await UserSchema.updateOne({ DiscordID: DiscordID }, { AllPokemons: userPokemons });
+
+        return `${pokemon.species} has learned ${learnmove} and forgotten ${forgetmove}`
+    
+    }
+    else {
+        PokMoves.push(learnmove);
+        await UserSchema.updateOne({ DiscordID: DiscordID }, { AllPokemons: userPokemons });
+
+        return `${pokemon.species} has learned ${learnmove}`
+
+    }
+
+
+}
+
+async function levelUpPokemon(pokemonID, DiscordID) {
+
+    const user = await UserSchema.findOne({ DiscordID : DiscordID });
+    if (!user) return "User Not Found";
+
+    const userPokemons = user.AllPokemons;
+    const userItems = user.Items;
+
+    const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID);
+    if (!pokemon) return "Pokemon Not Found";
+
+    const rareCandyIndex = userItems.findIndex(item => item.name === "rarecandy");
+
+    if (rareCandyIndex === -1) return "No Rare Candy Found";
+
+    userItems[rareCandyIndex].amount -= 1;
+
+    if (userItems[rareCandyIndex].amount === 0) {
+        userItems.splice(rareCandyIndex, 1);
+    }
+
+    const level = pokemon.level;
+    const newLevel = level + 2;
+
+    pokemon.level = newLevel;
+
+    await UserSchema.updateOne({ DiscordID: DiscordID }, { AllPokemons: userPokemons });
+
+    return `${pokemon.species} has leveled up to level ${newLevel}`;
+
 }
 
 
-module.exports = { Pokemon, getAbility, filterMovesByGen, checkMovesForScratchOrTackle, checkPokemonExists, getAligibleMoves };
+module.exports = {
+    Pokemon,
+    InvItem,
+    getAbility,
+    filterMovesByGen,
+    checkMovesForScratchOrTackle,
+    checkPokemonExists,
+    getAligibleMoves,
+    getSprites,
+    getType,
+    trainPokemon,
+    levelUpPokemon
+};
