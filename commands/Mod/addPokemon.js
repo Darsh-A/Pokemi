@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const UserSchema = require('../../mongo/Schemas/user');
-const {Pokemon, getAbility, checkPokemonExists} = require('../../Utils/UtilityClasses');
-const { generateRandomString } = require('../../Utils/miscFunc.js');
+const {Pokemon, getAbility, checkPokemonExists, getSprites} = require('../../Utils/UtilityClasses');
+const { generateRandomString, giveShiny } = require('../../Utils/miscFunc.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -46,13 +46,18 @@ module.exports = {
 
         const selectedAbility = getAbility(Generation, Species)
 
+        const isShiny = giveShiny()
+34
+        const Sprite = getSprites(Generation, Species,isShiny)
+
         const NewPokemon = new Pokemon(
             "", // Name
             Generation, // Generation
             generateRandomString(15), // ID
+            Sprite, // Sprite
             Species, // Species
             "", // Gender
-            "", // Shiny 
+            isShiny, // Shiny 
             "", // Item
             Level, // Level
             selectedAbility, // Ability // IS Randomized

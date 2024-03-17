@@ -7,6 +7,8 @@ let user = new Schema({
     AllPokemons: Array,
     AllMoves: Array,
     Team: Array,
+    Badges: Array,
+    Exp: Number,
 });
 
 module.exports = model('User', user);

@@ -113,7 +113,6 @@ module.exports = {
             } else if (i.customId === 'select_pokemon') {
 
                 isSelectionOver = true;
-                console.log('Selected Something')
 
                 const selectedPokemonIndex = i.values[0];
                 const selectedPokemon = UserPokemons.find((pokemon) => pokemon.index === parseInt(selectedPokemonIndex));
@@ -130,6 +129,13 @@ module.exports = {
                 }
 
                 // Update the embed with more information about the selected Pokémon
+                let rarecandy = user.Items.find(item => item.name.toLowerCase() === "rarecandy");
+                if(rarecandy) {
+                    rarecandy = rarecandy.amount;
+                }
+                else {
+                    rarecandy = 0;
+                }
                 const Pokemon_embed = new EmbedBuilder()
                     .setTitle(selectedPokemon.species)
                     .setDescription(` Level: ${selectedPokemon.level.toString()} \n Ability: ${selectedPokemon.ability} \n Nature: ${selectedPokemon.nature} \n Types: ${types.join(',')}`)
@@ -138,7 +144,7 @@ module.exports = {
                     )
                     .setThumbnail(sprite)
                     .setColor('#e36d83')
-                    .setFooter({text: `Rare Candy: ${user.Items.find(item => item.name.toLowerCase() === "rarecandy").amount} | 1 RareCandy = 2 Level`,iconURL: 'https://i.postimg.cc/52gBWdNY/image.png'})
+                    .setFooter({text: `Rare Candy: ${rarecandy} | 1 RareCandy = 2 Level`,iconURL: 'https://i.postimg.cc/52gBWdNY/image.png'})
 
                 const trainRow = new ActionRowBuilder()
                     .addComponents(

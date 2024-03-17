@@ -23,10 +23,20 @@ module.exports = {
         if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
 
         const userPokemons = user.AllPokemons;
+        if (userPokemons.length === 0) return interaction.reply(`User <@${UserID}> Has No Pokemons`)
+
+
+        let poks = [];
+        
+        for (let i = 0; i < userPokemons.length; i++) {
+            userPokemons[i] = `${i + 1}. ${userPokemons[i].species} - Lvl ${userPokemons[i].level}`
+
+            poks.push(userPokemons[i])
+        }
 
         const embed = new EmbedBuilder()
             .setTitle(`Pokemons of <@${UserID}>`)
-            .setDescription(userPokemons.join('\n'))
+            .setDescription(poks.join('\n'))
             .setColor('#b982e0')
             .setTimestamp()
         

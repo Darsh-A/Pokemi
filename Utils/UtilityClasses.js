@@ -6,10 +6,11 @@ const axios = require('axios');
 
 class Pokemon {
 
-    constructor(name, gen, id, species, gender, shiny, item, level, ability, evs, nature, ivs, moves) {
+    constructor(name, gen, id, sprite, species, gender, shiny, item, level, ability, evs, nature, ivs, moves) {
         this.name = name;
         this.gen = gen;
         this.id = id;
+        this.sprite = sprite;
         this.species = species;
         this.gender = gender;
         this.shiny = shiny
