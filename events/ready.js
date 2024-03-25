@@ -1,6 +1,10 @@
 const { ActivityType, Events } = require('discord.js');
 const mongoose = require('mongoose');
-const { mongoURL } = require('../config.json');
+const { config } = require('dotenv');
+
+config()
+
+const mongoURL = process.env.mongoURL;
 
 module.exports = {
     name: Events.ClientReady,

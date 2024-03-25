@@ -1,10 +1,12 @@
 // Require the necessary discord.js classes
-const { token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const events = require('events');
-const { io } = require('socket.io-client'); // Socket.io client
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+
+const { config } = require('dotenv');
+config()
+
+const token = process.env.token;
 
 /*
  ⭐ Add Intents Here

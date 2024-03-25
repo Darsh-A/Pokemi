@@ -1,6 +1,11 @@
 const { EmbedBuilder, WebhookClient, SlashCommandBuilder } = require('discord.js');
-const { CresseliaID, CresseliaToken } = require('../../config.json');
+const { config } = require('dotenv');
 
+config()
+
+const CresseliaID = process.env.CresseliaID;
+const CresseliaToken = process.env.CresseliaToken;
+ 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('cresselia')
