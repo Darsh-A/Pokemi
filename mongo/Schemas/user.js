@@ -9,6 +9,10 @@ let user = new Schema({
     Team: Array,
     Badges: Array,
     Exp: Number,
+    WildRef: {
+        lastGymLow: Number,
+        nextGymLow: Number
+    },
 });
 
 module.exports = model('User', user);

@@ -25,7 +25,7 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
+        if (!user) return interaction.editReply(`User <@${UserID}> Not Registered`)
 
         await UserSchema.findOneAndUpdate({ DiscordID: UserID }, {
             $inc: {
@@ -33,7 +33,7 @@ module.exports = {
             }
         })
 
-        await interaction.reply(`Added ${Amount} to <@${UserID}>`)
+        await interaction.editReply(`Added ${Amount} to <@${UserID}>`)
 
     }
 }

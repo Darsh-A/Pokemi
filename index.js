@@ -3,12 +3,16 @@ const { token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const events = require('events');
+const { io } = require('socket.io-client'); // Socket.io client
 
 /*
  ⭐ Add Intents Here
  */
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection();
+
+client.emit('verifyPokemon');
 
 // Command Handler
 const foldersPath = path.join(__dirname, 'commands');
@@ -43,5 +47,13 @@ for (const file of eventFiles) {
 	}
 }
 
+const UserSchema = require('./mongo/Schemas/user');
+const { Pokemon, checkPokemonExists, filterMovesByGen, getAbility, checkMovesForScratchOrTackle, getSprites } = require('./Utils/UtilityClasses');
+const { giveShiny } = require('./Utils/miscFunc.js');
+
+client.emit('verifyPokemon');
+
+
 // Log in to Discord with your client's token
 client.login(token);
+

@@ -34,11 +34,11 @@ module.exports = {
 
         const pokemonExists = checkPokemonExists(StarterPokemonGeneration, StarterPokemonSpecies);
 
-        if (!pokemonExists) return interaction.reply(`Pokemon ${StarterPokemonSpecies} Not Found in Generation ${StarterPokemonGeneration}`)
+        if (!pokemonExists) return interaction.editReply(`Pokemon ${StarterPokemonSpecies} Not Found in Generation ${StarterPokemonGeneration}`)
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (user) return interaction.reply(`User <@${UserID}> Already Registered`)
+        if (user) return interaction.editReply(`User <@${UserID}> Already Registered`)
         
         const moves  = filterMovesByGen(StarterPokemonGeneration, StarterPokemonSpecies);
         const selectedAbility = getAbility(StarterPokemonGeneration, StarterPokemonSpecies)
@@ -46,8 +46,8 @@ module.exports = {
 
         
         const isShiny = giveShiny()
-34
-        const Sprite = getSprites(StarterPokemonGeneration, StarterPokemonSpecies, isShiny)
+        
+        const Sprite = await getSprites(StarterPokemonGeneration, StarterPokemonSpecies, isShiny)
 
         const StarterPokemon = new Pokemon(
             "", // Name
@@ -60,10 +60,11 @@ module.exports = {
             "", // Item
             4, // Level
             selectedAbility, // Ability // IS Randomized
-            {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}, // EVs
+            {"hp": 1, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}, // EVs
             "Quirky", // Nature
             {"hp": 31, "atk": 31, "def": 31, "spa": 31, "spd": 31, "spe": 31}, // IVs
-            [preferredMove] // Moves // IS Fetched
+            [preferredMove], // Moves // IS Fetched
+            0
         )
 
 
@@ -75,9 +76,14 @@ module.exports = {
             AllPokemons: [StarterPokemon],
             AllMoves: [],
             Team: [StarterPokemon],
+            WildRef: {
+                lastGymLow: 0,
+                nextGymLow: 12
+            
+            },
         })
 
-        await interaction.reply(`User <@${UserID}> Registered`)
+        await interaction.editReply(`User <@${UserID}> Registered`)
 
     }
 }

@@ -1,21 +1,22 @@
 const { SlashCommandBuilder } = require('discord.js');
-const {Dex} = require('@pkmn/dex');
-const {Generations} = require('@pkmn/data');
-const {filterMovesByGen} = require('../../Utils/UtilityClasses');
+require('dotenv').config();
 
+const vision = require('@google-cloud/vision');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('test')
         .setDescription('what does the command do'),
 
     async execute(interaction) {
-        
-        const gen = new Generations(Dex);
-        const output = await gen.get(8).learnsets.get('Ursaring');
-        const learnset = output.learnset;
 
-        const moves = filterMovesByGen(8,learnset);
+        // Replace 'path/to/your/image.png' with the actual path to your QR code image
+        const fileName = 'qr.png';
 
-        console.log(moves);
+        const client = new vision.ImageAnnotatorClient();
+
+        const result = await client.textDetection(fileName);
+        console.log(result);
+        console.log(result[0].fullTextAnnotation);
+        console.log(result[0].textAnnotations);
     }
 }

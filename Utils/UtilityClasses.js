@@ -6,7 +6,7 @@ const axios = require('axios');
 
 class Pokemon {
 
-    constructor(name, gen, id, sprite, species, gender, shiny, item, level, ability, evs, nature, ivs, moves) {
+    constructor(name, gen, id, sprite, species, gender, shiny, item, level, ability, evs, nature, ivs, moves, defeatCount) {
         this.name = name;
         this.gen = gen;
         this.id = id;
@@ -21,6 +21,7 @@ class Pokemon {
         this.nature = nature;
         this.ivs = ivs;
         this.moves = moves;
+        this.defeatCount = defeatCount;
     }
 
     // Add methods to access or modify properties (optional)
@@ -38,6 +39,15 @@ class InvItem {
     }
     
 }
+
+class Badges {
+
+    constructor(name, icon) {
+        this.name = name;
+        this.icon = icon;
+    }
+}
+
 
 
 
@@ -247,6 +257,7 @@ async function levelUpPokemon(pokemonID, DiscordID) {
 module.exports = {
     Pokemon,
     InvItem,
+    Badges,
     getAbility,
     filterMovesByGen,
     checkMovesForScratchOrTackle,

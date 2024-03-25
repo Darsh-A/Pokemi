@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const GymSchema = require('../../mongo/Schemas/Gyms');
 const UserSchema = require('../../mongo/Schemas/user');
+const { levelup, levelupRareCandy } = require('../../Utils/miscFunc');
 
 
 module.exports = {
@@ -18,16 +19,16 @@ module.exports = {
 
         const GymLeader = await GymSchema.findOne({ DiscordID : user });
 
-        if (!GymLeader) return interaction.reply(`You are not a Gym Leader`);
+        if (!GymLeader) return interaction.editReply(`You are not a Gym Leader`);
 
         const options = interaction.options;
         const PlayerID = options.getString('discordid');
 
         const Player = await UserSchema.findOne({ DiscordID : PlayerID });
 
-        if (!Player) return interaction.reply(`User not found`);
+        if (!Player) return interaction.editReply(`User not found`);
 
-        if (Player.Badges.includes(GymLeader.Badge)) return interaction.reply(`User already has this badge`);
+        if (Player.Badges.includes(GymLeader.Badge)) return interaction.editReply(`User already has this badge`);
 
         Player.Badges.push(GymLeader.Badge);
 
@@ -35,7 +36,10 @@ module.exports = {
 
         await UserSchema.findOneAndUpdate({ DiscordID: PlayerID }, { Badges: Player.Badges });
 
-        return interaction.reply(`Badge ${GymLeader.Badge} Given to <@${PlayerID}>`); 
+        return interaction.editReply(`Badge ${GymLeader.Badge} Given to <@${PlayerID}>`);
 
+
+        levelup(PlayerID)
+        levelupRareCandy(PlayerID)
     }
 }

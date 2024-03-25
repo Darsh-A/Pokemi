@@ -42,11 +42,11 @@ module.exports = {
 
                     GymSchema.create(newGym);
 
-                    interaction.reply(`Gym Leader <@${DiscordID}> Added to the Database`)
+                    interaction.editReply(`Gym Leader <@${DiscordID}> Added to the Database`)
                 })
                 .catch((err) => {
                     console.log(err);
-                    interaction.reply(`Error Adding Gym Leader <@${DiscordID}> to the Database`)
+                    interaction.editReply(`Error Adding Gym Leader <@${DiscordID}> to the Database`)
                 });
     }
 }

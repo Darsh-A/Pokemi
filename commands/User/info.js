@@ -1,5 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
-const UserSchema = require('../../mongo/Schemas/Gyms');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const UserSchema = require('../../mongo/Schemas/user');
+const { uploadEmoji, deleteEmoji } = require('../../Utils/miscFunc');
+const axios = require('axios');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,24 +9,71 @@ module.exports = {
         .setDescription('Get your info'),
 
     async execute(interaction) {
-
-
         const userid = interaction.user.id;
+        const channel = interaction.channel;
 
         const user = await UserSchema.findOne({ DiscordID: userid });
-
-        if (!user) return interaction.reply("User Not Found");
-
         if (!user) {
-            return interaction.reply('You are not Registered');
+            return interaction.editReply('You are not registered');
         }
 
-        const team = user.Team;
+        const userTeam = user.Team;
+        const userBadges = user.Badges;
+        const userItems = user.Items;
 
-        const pokemon = team[0]
+        let emojiIDs = []; // To Delete all emojis later
 
-        const sprite = pokemon.Sprite;
+        // Team Info Formatting
+        let teamInfoFields = [];
+        for (const pokemon of userTeam) {
+            const emojiID = await uploadEmoji(interaction, pokemon);
+            emojiIDs.push(emojiID);
+            const index = userTeam.indexOf(pokemon);
+            teamInfoFields.push(
+                `Slot ${index + 1}: \n <a:${pokemon.id}:${emojiID}> - ${pokemon.species} - Lvl ${pokemon.level}\n`
+            );
+        }
 
-        await interaction.guild.emojis.create(sprite, 'sprite');
+        // Badges Info Formatting
+        let userBadgesFields = [];
+        if (userBadges.length === 0) {
+            userBadgesFields.push("No Badges");
+        } else {
+            for (const badge of userBadges) {
+                const badgeName = badge.name;
+                const badgeIcon = badge.icon;
+                const badgeEmojiID = await uploadEmoji(interaction, badgeName);
+                emojiIDs.push(badgeEmojiID);
+                userBadgesFields.push(
+                    `Badge: \n <a:${badgeName}:${badgeEmojiID}> \n\n`
+                );
+            }
+        }
+
+        let userItemsFields = [];
+        if (userItems.length === 0) {
+            userItemsFields.push("No Items");
+        } else {
+            for (const item of userItems) {
+                const itemName = item.name;
+                const itemamount = item.amount;
+                userItemsFields.push(
+                    `Item: \n ${itemName}: ${itemamount}`
+                );
+            }
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle(`${interaction.user.username}`)
+            .setDescription(`Badges: \n${userBadgesFields.join('')} \n\nTeam: \n ${teamInfoFields.join('')} \nItems: \n${userItemsFields.join('')} \n\nMoney: \n${user.Money} \n\n`) 
+            .setThumbnail(interaction.user.avatarURL())
+            .setTimestamp()
+            .setColor('#f76084');
+        await channel.send({ embeds: [embed] });
+
+        for (const ids of emojiIDs) {
+            await deleteEmoji(interaction, ids);
+        }   
+
     }
 }

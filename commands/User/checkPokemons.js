@@ -20,13 +20,13 @@ module.exports = {
         const userid = interaction.user.id;
         const user = await UserSchema.findOne({ DiscordID: userid });
 
-        if (!user) return interaction.reply(`User <@${userid}> Not Registered`);
+        if (!user) return interaction.editReply(`User <@${userid}> Not Registered`);
 
         let UserPokemons = user.AllPokemons;
 
         if (searchTerm) {
             UserPokemons = UserPokemons.filter(pokemon => pokemon.species.toLowerCase().includes(searchTerm.toLowerCase()));
-            if (UserPokemons.length === 0) return interaction.reply(`No Pokemons Found with the name ${searchTerm}`);
+            if (UserPokemons.length === 0) return interaction.editReply(`No Pokemons Found with the name ${searchTerm}`);
         }
 
         const totalPages = Math.ceil(UserPokemons.length / pokemonsPerPage);
@@ -86,7 +86,7 @@ module.exports = {
 
             // Send or edit the reply based on whether the interaction has been replied to
             if (!interaction.replied) {
-                await interaction.reply({ embeds: [embed], components: [row, selectRow] });
+                await interaction.editReply({ embeds: [embed], components: [row, selectRow] });
             } else {
                 await interaction.editReply({ embeds: [embed], components: [row, selectRow] });
             }
@@ -120,7 +120,7 @@ module.exports = {
                 const types = await getType(selectedPokemon.gen, selectedPokemon.species);
                 const moves = selectedPokemon.moves;
 
-                const heartScales = user.Items.find(item => item.name.toLowerCase() === "heartscale");
+                // const heartScales = user.Items.find(item => item.name.toLowerCase() === "heartscale");
 
 
                 let movefields = [];
@@ -147,6 +147,12 @@ module.exports = {
                     .setFooter({text: `Rare Candy: ${rarecandy} | 1 RareCandy = 2 Level`,iconURL: 'https://i.postimg.cc/52gBWdNY/image.png'})
 
                 const trainRow = new ActionRowBuilder()
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('nickname_pokemon')
+                            .setLabel('NickName')
+                            .setStyle('Primary')
+                    )
                     .addComponents(
                         new ButtonBuilder()
                             .setCustomId('levelup_pokemon')
@@ -271,6 +277,19 @@ module.exports = {
                         const response = await levelUpPokemon(selectedPokemon.id, userid);
                         await interaction.editReply(response);
 
+                    }
+                    else if (i.customId === 'nickname_pokemon') {
+                        
+                        const nickname = await interaction.channel.send(`Enter Nickname for ${selectedPokemon.species}`);
+                        const filter = m => m.author.id === interaction.user.id;
+                        const collector = interaction.channel.createMessageCollector({ filter, time: 60000 });
+
+                        collector.on('collect', async (m) => {
+                            const nickname = m.content;
+                            const response = await UserSchema.findOneAndUpdate({ DiscordID: userid, "AllPokemons.id": selectedPokemon.id }, { "AllPokemons.$.name": nickname });
+                            await interaction.editReply(`Nickname Updated to ${nickname}`);
+                            collector.stop();
+                        });
                     }
                 });
 

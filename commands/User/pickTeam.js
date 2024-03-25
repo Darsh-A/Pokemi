@@ -11,7 +11,7 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: userid });
 
-        if (!user) return interaction.reply("User Not Found");
+        if (!user) return interaction.editReply("User Not Found");
 
         const userPokemons = user.AllPokemons;
         const userTeam = user.Team;
@@ -24,17 +24,19 @@ module.exports = {
             });
         }
 
+        let maxvalue = Math.min(menuOptions.length, 6);
+
         const menu = new StringSelectMenuBuilder()
             .setCustomId('team')
             .setPlaceholder('Select a Pokemon')
             .addOptions(menuOptions)
             .setMinValues(1)
-            .setMaxValues(6);
+            .setMaxValues(maxvalue);
 
         const row = new ActionRowBuilder()
             .addComponents(menu);
 
-        await interaction.reply({ content: 'Pick a Pokemon for your Team', components: [row] });
+        await interaction.editReply({ content: 'Pick a Pokemon for your Team', components: [row] });
 
         const filter = i => i.customId === 'team' && i.user.id === userid;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });

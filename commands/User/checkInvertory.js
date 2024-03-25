@@ -13,7 +13,7 @@ module.exports = {
         
         const user = await UserSchema.findOne({ DiscordID : userid });
 
-        if (!user) return interaction.reply(`User <@${userid}> Not Registered`)
+        if (!user) return interaction.editReply(`User <@${userid}> Not Registered`)
 
         const inventory = user.Items;
 
@@ -29,7 +29,7 @@ module.exports = {
             .setColor('#e36d83')
             .setTimestamp()
         
-        await interaction.reply({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
         
     }
 }

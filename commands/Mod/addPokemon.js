@@ -39,16 +39,16 @@ module.exports = {
 
         const pokemonExists = checkPokemonExists(Generation, Species);
 
-        if (!pokemonExists) return interaction.reply(`Pokemon ${Species} Not Found in Generation ${Generation}`)
+        if (!pokemonExists) return interaction.editReply(`Pokemon ${Species} Not Found in Generation ${Generation}`)
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
+        if (!user) return interaction.editReply(`User <@${UserID}> Not Registered`)
 
         const selectedAbility = getAbility(Generation, Species)
 
         const isShiny = giveShiny()
 34
-        const Sprite = getSprites(Generation, Species,isShiny)
+        const Sprite = await getSprites(Generation, Species,isShiny)
 
         const NewPokemon = new Pokemon(
             "", // Name
@@ -61,10 +61,11 @@ module.exports = {
             "", // Item
             Level, // Level
             selectedAbility, // Ability // IS Randomized
-            {"hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}, // EVs
+            {"hp": 1, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}, // EVs
             "Quirky", // Nature
             {"hp": 31, "atk": 31, "def": 31, "spa": 31, "spd": 31, "spe": 31}, // IVs
-            ["scratch"] // Moves // IS Fetched
+            ["scratch"], // Moves // IS Fetched
+            0
         )
 
         await   UserSchema.findOneAndUpdate({ DiscordID: UserID }, {
@@ -73,7 +74,7 @@ module.exports = {
             }
         })
 
-        await interaction.reply(`Added ${Species} to <@${UserID}>`)
+        await interaction.editReply(`Added ${Species} to <@${UserID}>`)
 
 
 

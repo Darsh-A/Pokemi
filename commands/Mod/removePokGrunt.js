@@ -25,15 +25,24 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
+        if (!user) return interaction.editReply(`User <@${UserID}> Not Registered`)
 
-        await UserSchema.findOneAndUpdate({ DiscordID: UserID }, {
-            $pull: {
-                AllPokemons: Pokemon
-            }
-        })
+        const userPokemons = user.AllPokemons;
 
-        await interaction.reply(`Removed ${Pokemon} from <@${UserID}>`)
+        const pokemonExists = userPokemons.find(pokemon => pokemon.species === Pokemon);
+
+        if (!pokemonExists) return interaction.editReply(`Pokemon ${Pokemon} Not Found in <@${UserID}>'s Collection`)
+
+        const newPokemons = userPokemons.filter(pokemon => pokemon.species !== Pokemon);
+
+        await UserSchema.findOneAndUpdate({ DiscordID: UserID }, { AllPokemons: newPokemons });
+
+        // remove from the team also
+        const userTeam = user.Team;
+        const newTeam = userTeam.filter(pokemon => pokemon.species !== Pokemon);
+        await UserSchema.findOneAndUpdate({ DiscordID: UserID }, { Team: newTeam });
+
+        await interaction.editReply(`Removed ${Pokemon} from <@${UserID}>`)
 
     }
 }
