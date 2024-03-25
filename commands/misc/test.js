@@ -1,8 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { getEvolutions } = require('../../Utils/UtilityClasses');
 
-const { uploadEmojiOther } = require('../../Utils/miscFunc');
-
-const vision = require('@google-cloud/vision');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('test')
@@ -10,6 +8,7 @@ module.exports = {
 
     async execute(interaction) {
 
-        uploadEmojiOther(interaction,"https://static.wikia.nocookie.net/pokemon/images/5/53/Iciclebadge.png", "Ice")
+        getEvolutions('pikachu')
+
     }
 }

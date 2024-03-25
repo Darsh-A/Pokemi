@@ -5,7 +5,6 @@ let user = new Schema({
     Items: Array,
     Money: Number,
     AllPokemons: Array,
-    AllMoves: Array,
     Team: Array,
     Badges: Array,
     Exp: Number,

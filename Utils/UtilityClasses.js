@@ -23,12 +23,6 @@ class Pokemon {
         this.moves = moves;
         this.defeatCount = defeatCount;
     }
-
-    // Add methods to access or modify properties (optional)
-    getStats() {
-        // Implement logic to calculate or retrieve stats based on level, etc.
-        return { /* stats object */ };
-    }
 }
 
 class InvItem {
@@ -224,37 +218,78 @@ async function trainPokemon(pokemonID, DiscordID, forgetmove, learnmove, MoveRep
 
 }
 
-async function levelUpPokemon(pokemonID, DiscordID) {
-
-    const user = await UserSchema.findOne({ DiscordID : DiscordID });
+async function levelUpPokemon(pokemonID, DiscordID, numRareCandies) {
+    const user = await UserSchema.findOne({ DiscordID: DiscordID });
     if (!user) return "User Not Found";
 
-    const userPokemons = user.AllPokemons;
+    const userPokemons = [...user.AllPokemons]; // Create a shallow copy
     const userItems = user.Items;
 
-    const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID);
-    if (!pokemon) return "Pokemon Not Found";
+    const pokemonIndex = userPokemons.findIndex(pokemon => pokemon.id === pokemonID);
+    if (pokemonIndex === -1) return "Pokemon Not Found";
+
+    const pokemon = userPokemons[pokemonIndex];
 
     const rareCandyIndex = userItems.findIndex(item => item.name === "rarecandy");
 
-    if (rareCandyIndex === -1) return "No Rare Candy Found";
+    if (rareCandyIndex === -1 || userItems[rareCandyIndex].amount < numRareCandies) 
+        return "Insufficient Rare Candies";
 
-    userItems[rareCandyIndex].amount -= 1;
+    userItems[rareCandyIndex].amount -= numRareCandies;
 
     if (userItems[rareCandyIndex].amount === 0) {
         userItems.splice(rareCandyIndex, 1);
     }
 
     const level = pokemon.level;
-    const newLevel = level + 2;
+    const newLevel = level + numRareCandies;
 
-    pokemon.level = newLevel;
+    // Update the cloned Pokemon's level
+    userPokemons[pokemonIndex].level = newLevel;
 
     await UserSchema.updateOne({ DiscordID: DiscordID }, { AllPokemons: userPokemons });
 
-    return `${pokemon.species} has leveled up to level ${newLevel}`;
+    return `${pokemon.species} has leveled up by ${numRareCandies} levels to level ${newLevel}`;
+}
+
+async function getStats(gen, species) {
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${species.toLowerCase()}`);
+
+    const stats = response.data.stats;
+
+    const baseStats = {};
+
+    for (const stat of stats) {
+        baseStats[stat.stat.name] = stat.base_stat;
+    }
+    
+    return baseStats;
 
 }
+
+async function getEvolutions(species) {
+
+    const PokSepcies = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${species.toLowerCase()}`);
+    const evoChainURL = PokSepcies.data.evolution_chain.url;
+    const response = await axios.get(evoChainURL);
+    const evoChain = response.data.chain;
+
+    if (evoChain.evolves_to.length === 0) {
+        return false;
+    }
+
+    const evolvesToSpecies = evoChain.evolves_to[0].species.name;
+    let evolvesAt = evoChain.evolves_to[0].evolution_details[0].min_level;
+
+    if (evolvesAt == null) {
+        evolvesAt = 36;
+    }
+
+    return { evolvesToSpecies, evolvesAt }
+
+}
+
+
 
 
 module.exports = {
@@ -269,5 +304,7 @@ module.exports = {
     getSprites,
     getType,
     trainPokemon,
-    levelUpPokemon
+    levelUpPokemon,
+    getStats,
+    getEvolutions
 };

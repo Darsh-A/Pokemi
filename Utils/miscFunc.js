@@ -156,6 +156,25 @@ async function getLevel(discordID) {
 
 }
 
+// Check if newPokemon is a complete Pokemon object
+function isCompletePokemon(newPokemon) {
+  // Assuming all fields are required
+  const pokemonData = Object.values(newPokemon)[0]; // Accessing the Pokemon object using the first key
+  return (
+      typeof pokemonData === 'object' &&
+      pokemonData.gen !== undefined &&
+      pokemonData.id !== undefined &&
+      pokemonData.species !== undefined &&
+      pokemonData.evs !== undefined &&
+      Object.keys(pokemonData.evs).length > 0 &&
+      pokemonData.nature !== undefined &&
+      pokemonData.ivs !== undefined &&
+      Object.keys(pokemonData.ivs).length > 0
+  );
+}
+
+
+
 module.exports = {
   generateRandomString,
   convertToShowdownFormat,
@@ -165,5 +184,6 @@ module.exports = {
   deleteEmoji,
   levelup,
   levelupRareCandy,
-  getLevel
+  getLevel,
+  isCompletePokemon
 }

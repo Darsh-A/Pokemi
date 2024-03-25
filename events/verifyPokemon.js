@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const UserSchema = require('../mongo/Schemas/user');
-const { Pokemon, checkPokemonExists, filterMovesByGen, getAbility, checkMovesForScratchOrTackle, getSprites } = require('../Utils/UtilityClasses');
-const { giveShiny, levelup, levelupRareCandy, getLevel } = require('../Utils/miscFunc.js');
+const { Pokemon, checkPokemonExists, filterMovesByGen, getAbility, checkMovesForScratchOrTackle, getSprites, getEvolutions } = require('../Utils/UtilityClasses');
+const { giveShiny, levelup, levelupRareCandy, getLevel, isCompletePokemon } = require('../Utils/miscFunc.js');
 
 // Object to store the last update timestamps for each user
 const userCooldowns = {};
@@ -48,19 +48,21 @@ module.exports = {
 
             if (change.operationType === 'update' && key.startsWith('AllPokemons.')) {
 
-                console.log("Pokemon Added...")
+                console.log("Pokemon Updated...")
 
                 const userId = change.documentKey._id;
 
                 const newPokemon = change.updateDescription.updatedFields;
                 console.log(newPokemon)
+                if (!isCompletePokemon(newPokemon)) return;
+                console.log("Valid Pokemon")
                 const updatedUser = await UserSchema.findOne({ _id: userId });
 
                 const addedPokemonKey = Object.keys(newPokemon).find(key => key.startsWith('AllPokemons.'));
 
                 // **Check for specific addition to AllPokemons array:**
                 if (addedPokemonKey) {
-                    
+
                     const addedPokemon = newPokemon[addedPokemonKey];
                     const species = addedPokemon.species;
                     const generation = addedPokemon.gen;
@@ -109,6 +111,30 @@ module.exports = {
                         // You can uncomment and customize these lines as needed
                         levelup(updatedUser.DiscordID);
                         levelupRareCandy(updatedUser.DiscordID);
+
+                        // check for evoltions
+
+                        const UpdatedFinalUser = await UserSchema.findOne({ DiscordID: updatedUser.DiscordID });
+
+                        const allUpdatedPokemons = UpdatedFinalUser.Team;
+
+                        console.log("Entering the shit")
+
+                        for (const pokemon of allUpdatedPokemons) {
+
+                            const evolution = await getEvolutions(pokemon.species);
+
+                            if (!evolution) return;
+
+                            if (pokemon.level >= evolution.evolvesAt) {
+                                console.log(`Pokemon ${pokemon.species} is ready to evolve!`)
+                                const newSpecies = evolution.evolvesToSpecies;
+                                pokemon.species = newSpecies;
+
+                                await UserSchema.findOneAndUpdate({ DiscordID: updatedUser.DiscordID, "AllPokemons.id": pokemon.id }, { "AllPokemons.$.species": newSpecies });
+                            }
+                        }
+
                     } else {
                         console.log(`Invalid Pokemon added for user ${userId}: ${species}`);
                         // Handle invalid Pokemon addition (e.g., remove from array)
