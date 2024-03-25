@@ -14,32 +14,35 @@ module.exports = {
             .setRequired(true)
         ),
     async execute(interaction) {
-        
-        const user = interaction.user.id
+        const gymLeaderID = interaction.user.id;
 
-        const GymLeader = await GymSchema.findOne({ DiscordID : user });
+        const options = interaction.options._hoistedOptions;
+        const UserDiscordID = options.find(option => option.name === 'discordid').value;
 
-        if (!GymLeader) return interaction.editReply(`You are not a Gym Leader`);
+        const gymLeader = await GymSchema.findOne({ DiscordID: gymLeaderID });
+        if (!gymLeader) {
+            return await interaction.editReply({ content: `You are not a Gym Leader` });
+        }
 
-        const options = interaction.options;
-        const PlayerID = options.getString('discordid');
+        const user = await UserSchema.findOne({ DiscordID: UserDiscordID });
+        if (!user) {
+            return await interaction.editReply({ content: `User not found` });
+        }
 
-        const Player = await UserSchema.findOne({ DiscordID : PlayerID });
+        if (user.Badges.includes(gymLeader.Badge)) {
+            return await interaction.editReply({ content: `User already has this Badge` });
+        }
 
-        if (!Player) return interaction.editReply(`User not found`);
+        console.log(gymLeader.Badge)
 
-        if (Player.Badges.includes(GymLeader.Badge)) return interaction.editReply(`User already has this badge`);
+        console.log(gymLeader.Badge.currentlow, gymLeader.Badge.nextlow)
+        user.WildRef.lastGymLow = gymLeader.Badge.currentlow;
+        user.WildRef.nextGymLow = gymLeader.Badge.nextlow;
 
-        Player.Badges.push(GymLeader.Badge);
+        user.Badges.push(gymLeader.Badge);
 
-        // update the data of the player in mongo
+        await user.save();
 
-        await UserSchema.findOneAndUpdate({ DiscordID: PlayerID }, { Badges: Player.Badges });
-
-        return interaction.editReply(`Badge ${GymLeader.Badge} Given to <@${PlayerID}>`);
-
-
-        levelup(PlayerID)
-        levelupRareCandy(PlayerID)
+        await interaction.editReply({ content: `Badge Given` });
     }
 }

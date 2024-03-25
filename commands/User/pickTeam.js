@@ -19,7 +19,7 @@ module.exports = {
         let menuOptions = [];
         for (let i = 0; i < userPokemons.length; i++) {
             menuOptions.push({
-                label: userPokemons[i].species,
+                label: `${userPokemons[i].species} - ${userPokemons[i].level}`,
                 value: userPokemons[i].id
             });
         }

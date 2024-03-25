@@ -68,6 +68,17 @@ async function uploadEmoji(interaction, pokemon) {
 
 }
 
+async function uploadEmojiOther (interaction,url,name) {
+  const response = await axios.get(url, { responseType: 'arraybuffer' });
+
+  const spriteBuffer = response.data;
+
+  const emoji = await interaction.guild.emojis.create({ attachment: spriteBuffer, name: name });
+
+  return emoji.id;
+
+}
+
 async function deleteEmoji(interaction, emojiID) {
 
   await interaction.guild.emojis.delete(emojiID);
@@ -150,6 +161,7 @@ module.exports = {
   convertToShowdownFormat,
   giveShiny,
   uploadEmoji,
+  uploadEmojiOther,
   deleteEmoji,
   levelup,
   levelupRareCandy,

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-require('dotenv').config();
+
+const { uploadEmojiOther } = require('../../Utils/miscFunc');
 
 const vision = require('@google-cloud/vision');
 module.exports = {
@@ -9,14 +10,6 @@ module.exports = {
 
     async execute(interaction) {
 
-        // Replace 'path/to/your/image.png' with the actual path to your QR code image
-        const fileName = 'qr.png';
-
-        const client = new vision.ImageAnnotatorClient();
-
-        const result = await client.textDetection(fileName);
-        console.log(result);
-        console.log(result[0].fullTextAnnotation);
-        console.log(result[0].textAnnotations);
+        uploadEmojiOther(interaction,"https://static.wikia.nocookie.net/pokemon/images/5/53/Iciclebadge.png", "Ice")
     }
 }

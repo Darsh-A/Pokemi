@@ -1,52 +1,53 @@
-const { SlashCommandBuilder } = require('discord.js');
-const GymSchema = require('../../mongo/Schemas/Gyms');
-const {Gyms} = require('../../Utils/gymLeadersData');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const GymUser = require('../../mongo/Schemas/Gyms');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('addgymleader')
-        .setDescription('Adds a Gym Leader to the Database')
-        .setDefaultMemberPermissions(0)
+        .setName('addgym')
+        .setDescription('Registers a Gym Leader')
         .addStringOption(option => option
             .setName('discordid')
-            .setDescription('The DiscordID of the Gym Leader')
-            .setRequired(true)
-        )
+            .setDescription('ID of the User')
+            .setRequired(true))
         .addStringOption(option => option
-            .setName('name')
-            .setDescription('The Name of the Gym Leader')
-            .setRequired(true)
-        ),
+            .setName('type')
+            .setDescription('Type of Gym')
+            .setRequired(true)),
 
     async execute(interaction) {
-            
-            const options = interaction.options;
-            const DiscordID = options.getString('discordid');
-            const Name = options.getString('name');
-    
-            const gym = Gyms(); 
-    
-            const newGym = new GymSchema({
-                DiscordID: DiscordID,
-                Name: Name,
-                Team: gym.Team,
-                Badge: gym.Badge,
-                Type: gym.Type,
-                Location: gym.Location,
-                LvlMin: gym.LvlMin,
-                LvlMax: gym.LvlMax,
-            });
-    
-            newGym.save()
-                .then(() => {
+        const { Gyms } = require('../../Utils/gymLeadersData')
+        const gymData = await Gyms();
+        console.log(gymData[0])
+        // Ensure gymData is an array
+        if (!Array.isArray(gymData)) {
+            console.error('Gym data is not an array');
+            return;
+        }
 
-                    GymSchema.create(newGym);
 
-                    interaction.editReply(`Gym Leader <@${DiscordID}> Added to the Database`)
-                })
-                .catch((err) => {
-                    console.log(err);
-                    interaction.editReply(`Error Adding Gym Leader <@${DiscordID}> to the Database`)
-                });
+        const options = interaction.options._hoistedOptions;
+        const discordID = options.find(option => option.name === 'discordid').value;
+        const type = options.find(option => option.name === 'type').value;
+
+        const gym = gymData.find(gym => gym.Type.toLowerCase() === type.toLowerCase());
+
+        if (!gym) {
+            return await interaction.editReply({ content: `Gym Type not found` });
+        }
+
+        const newGym = new GymUser({
+            DiscordID: discordID,
+            Name: interaction.user.username,
+            Badge: gym.Badge,
+            Type: gym.Type,
+            Location: gym.Location,
+            LvlMin: gym.LvlMin,
+            LvlMax: gym.LvlMax,
+        });
+
+        await newGym.save();
+
+        await interaction.editReply({ content: `Gym Leader Registered` });
+
     }
 }

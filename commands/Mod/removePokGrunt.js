@@ -29,20 +29,20 @@ module.exports = {
 
         const userPokemons = user.AllPokemons;
 
-        const pokemonExists = userPokemons.find(pokemon => pokemon.species === Pokemon);
+        const pokemonIndex = userPokemons.map(pokemon => pokemon.species).lastIndexOf(Pokemon);
 
-        if (!pokemonExists) return interaction.editReply(`Pokemon ${Pokemon} Not Found in <@${UserID}>'s Collection`)
+        if (pokemonIndex === -1) return interaction.editReply(`Pokemon ${Pokemon} Not Found in <@${UserID}>'s Collection`)
 
-        const newPokemons = userPokemons.filter(pokemon => pokemon.species !== Pokemon);
+        const removedPokemon = userPokemons[pokemonIndex];
+        const newPokemons = [...userPokemons.slice(0, pokemonIndex), ...userPokemons.slice(pokemonIndex + 1)];
 
         await UserSchema.findOneAndUpdate({ DiscordID: UserID }, { AllPokemons: newPokemons });
 
-        // remove from the team also
+        // Remove from the team using the ID of the removed Pokémon
         const userTeam = user.Team;
-        const newTeam = userTeam.filter(pokemon => pokemon.species !== Pokemon);
+        const newTeam = userTeam.filter(pokemon => pokemon.id !== removedPokemon.id);
         await UserSchema.findOneAndUpdate({ DiscordID: UserID }, { Team: newTeam });
 
-        await interaction.editReply(`Removed ${Pokemon} from <@${UserID}>`)
-
+        await interaction.editReply(`Removed ${Pokemon} from <@${UserID}>`);
     }
 }

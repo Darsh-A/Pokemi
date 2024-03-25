@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const UserSchema = require('../../mongo/Schemas/user');
-const { uploadEmoji, deleteEmoji } = require('../../Utils/miscFunc');
+const { uploadEmoji, deleteEmoji, uploadEmojiOther } = require('../../Utils/miscFunc');
 const axios = require('axios');
 
 module.exports = {
@@ -42,10 +42,10 @@ module.exports = {
             for (const badge of userBadges) {
                 const badgeName = badge.name;
                 const badgeIcon = badge.icon;
-                const badgeEmojiID = await uploadEmoji(interaction, badgeName);
+                const badgeEmojiID = await uploadEmojiOther(interaction, badgeIcon, badgeName);
                 emojiIDs.push(badgeEmojiID);
                 userBadgesFields.push(
-                    `Badge: \n <a:${badgeName}:${badgeEmojiID}> \n\n`
+                    `<:${badgeName}:${badgeEmojiID}> - ${badgeName}\n`
                 );
             }
         }
@@ -58,7 +58,7 @@ module.exports = {
                 const itemName = item.name;
                 const itemamount = item.amount;
                 userItemsFields.push(
-                    `Item: \n ${itemName}: ${itemamount}`
+                    `${itemName}: ${itemamount}`
                 );
             }
         }

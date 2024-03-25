@@ -42,9 +42,12 @@ class InvItem {
 
 class Badges {
 
-    constructor(name, icon) {
+    constructor(name, icon, currentlow, nextlow) {
         this.name = name;
         this.icon = icon;
+        this.currentlow = currentlow;
+        this.nextlow = nextlow;
+
     }
 }
 
