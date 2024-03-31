@@ -74,7 +74,7 @@ module.exports = {
             }
         })
 
-        await interaction.editReply(`Added ${Species} to <@${UserID}>`)
+        await interaction.reply(`Added ${Species} to <@${UserID}>`)
 
 
 

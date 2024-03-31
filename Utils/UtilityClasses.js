@@ -31,7 +31,7 @@ class InvItem {
         this.name = name;
         this.amount = amount;
     }
-    
+
 }
 
 class Badges {
@@ -173,14 +173,14 @@ async function getType(gen, species) {
     for (const type of allTypes) {
         types.push(type.type.name);
     }
-    
+
 
     return types;
 }
 
 async function trainPokemon(pokemonID, DiscordID, forgetmove, learnmove, MoveReplace) {
 
-    const user = await UserSchema.findOne({ DiscordID : DiscordID });
+    const user = await UserSchema.findOne({ DiscordID: DiscordID });
     if (!user) return "User Not Found";
 
     const userPokemons = user.AllPokemons;
@@ -193,19 +193,19 @@ async function trainPokemon(pokemonID, DiscordID, forgetmove, learnmove, MoveRep
     // if the learnmove already exists in the moveset, return
     if (PokMoves.includes(learnmove)) return "Move Already Exists";
 
-    if(learnmove === forgetmove) return "Cannot Replace with the same move";1
+    if (learnmove === forgetmove) return "Cannot Replace with the same move"; 1
 
     if (PokMoves.length === 4 && MoveReplace) {
         const moveIndex = PokMoves.indexOf(forgetmove);
 
         if (moveIndex === -1) return console.log("Move Not Found");
-    
+
         PokMoves[moveIndex] = learnmove;
-    
+
         await UserSchema.updateOne({ DiscordID: DiscordID }, { AllPokemons: userPokemons });
 
         return `${pokemon.species} has learned ${learnmove} and forgotten ${forgetmove}`
-    
+
     }
     else {
         PokMoves.push(learnmove);
@@ -232,7 +232,7 @@ async function levelUpPokemon(pokemonID, DiscordID, numRareCandies) {
 
     const rareCandyIndex = userItems.findIndex(item => item.name === "rarecandy");
 
-    if (rareCandyIndex === -1 || userItems[rareCandyIndex].amount < numRareCandies) 
+    if (rareCandyIndex === -1 || userItems[rareCandyIndex].amount < numRareCandies)
         return "Insufficient Rare Candies";
 
     userItems[rareCandyIndex].amount -= numRareCandies;
@@ -249,7 +249,7 @@ async function levelUpPokemon(pokemonID, DiscordID, numRareCandies) {
 
     await UserSchema.updateOne({ DiscordID: DiscordID }, { AllPokemons: userPokemons });
 
-    return `${pokemon.species} has leveled up by ${numRareCandies} levels to level ${newLevel}`;
+    return [`${pokemon.species} has leveled up by ${numRareCandies} levels to level ${newLevel}`,newLevel];
 }
 
 async function getStats(gen, species) {
@@ -262,31 +262,63 @@ async function getStats(gen, species) {
     for (const stat of stats) {
         baseStats[stat.stat.name] = stat.base_stat;
     }
-    
+
     return baseStats;
 
 }
 
-async function getEvolutions(species) {
-
-    const PokSepcies = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${species.toLowerCase()}`);
-    const evoChainURL = PokSepcies.data.evolution_chain.url;
+async function getNextEvolution(currentSpecies) {
+    const PokSpecies = await axios.get(`https://pokeapi.co/api/v2/pokemon-species/${currentSpecies.toLowerCase()}`);
+    const evoChainURL = PokSpecies.data.evolution_chain.url;
     const response = await axios.get(evoChainURL);
     const evoChain = response.data.chain;
 
-    if (evoChain.evolves_to.length === 0) {
-        return false;
+    return findNextEvolution(evoChain, currentSpecies);
+}
+
+function findNextEvolution(chain, currentSpecies) {
+    if (!chain || !chain.species || !chain.evolves_to) {
+        return null;
     }
 
-    const evolvesToSpecies = evoChain.evolves_to[0].species.name;
-    let evolvesAt = evoChain.evolves_to[0].evolution_details[0].min_level;
-
-    if (evolvesAt == null) {
-        evolvesAt = 36;
+    // Find the current species in the chain
+    if (chain.species.name === currentSpecies.toLowerCase()) {
+        // Check if there is an evolution after the current species
+        if (chain.evolves_to.length > 0) {
+            const nextEvolution = chain.evolves_to[0];
+            if (nextEvolution.evolution_details.length > 0 && nextEvolution.evolution_details[0].min_level !== null) {
+                return { species: nextEvolution.species.name, evolvesAt: nextEvolution.evolution_details[0].min_level };
+            } else {
+                return { species: nextEvolution.species.name, evolvesAt: "Special" };
+            }
+        } else {
+            return null; // No further evolution
+        }
     }
 
-    return { evolvesToSpecies, evolvesAt }
+    // Recursively search for the next evolution
+    for (const nextChain of chain.evolves_to) {
+        const result = findNextEvolution(nextChain, currentSpecies);
+        if (result) {
+            return result;
+        }
+    }
 
+    return null; // Next evolution not found
+}
+
+// Example usage
+async function getEvolutions(currentSpecies) {
+    const nextEvolution = await getNextEvolution(currentSpecies);
+    if (!nextEvolution) {
+        return false; // No next evolution found
+    }
+
+    // Now you can handle the nextEvolution
+    // For example, get the minimum level or other details
+    // You can modify this as per your requirements
+    const { species, evolvesAt } = nextEvolution;
+    return { evolvesToSpecies: species, evolvesAt };
 }
 
 

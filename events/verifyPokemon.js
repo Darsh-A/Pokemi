@@ -128,6 +128,7 @@ module.exports = {
 
                             if (pokemon.level >= evolution.evolvesAt) {
                                 console.log(`Pokemon ${pokemon.species} is ready to evolve!`)
+                                console.log(evolution.evolvesToSpecies)
                                 const newSpecies = evolution.evolvesToSpecies;
                                 pokemon.species = newSpecies;
 

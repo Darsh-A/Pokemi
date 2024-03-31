@@ -82,13 +82,10 @@ module.exports = {
                 );
 
 
-            // Defer the interaction to inform Discord that the bot is processing it
-
-            // Send or edit the reply based on whether the interaction has been replied to
             if (!interaction.replied) {
-                await interaction.editReply({ embeds: [embed], components: [row, selectRow] });
+                await interaction.reply({ embeds: [embed], components: [row, selectRow] });
             } else {
-                await interaction.editReply({ embeds: [embed], components: [row, selectRow] });
+                await interaction.editReply({ embeds: [embed], components: [row, selectRow] }).catch(error => console.log('editReply errored', error));
             }
         };
 
@@ -97,30 +94,31 @@ module.exports = {
         const filter = i => i.user.id === interaction.user.id;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000, max: 50 });
 
-        let isSelectionOver = false;
-
         collector.on('collect', async i => {
+            await i.deferUpdate()
             if (i.customId === 'previous_page') {
+                console.log('Previous Page Clicked');
                 page--;
                 start = page * pokemonsPerPage;
                 end = start + pokemonsPerPage;
-                await sendPage(page);
+                await sendPage(page).catch(error => console.log('editReply errored', error));
             } else if (i.customId === 'next_page') {
+                console.log('Next Page Clicked');
                 page++;
                 start = page * pokemonsPerPage;
                 end = start + pokemonsPerPage;
-                await sendPage(page);
+                await sendPage(page).catch(error => console.log('editReply errored', error));
             } else if (i.customId === 'select_pokemon') {
 
-                isSelectionOver = true;
+                await collector.stop()
+
+                console.log("Pokemon Selected: ", i.values[0])
 
                 const selectedPokemonIndex = i.values[0];
                 const selectedPokemon = UserPokemons.find((pokemon) => pokemon.index === parseInt(selectedPokemonIndex));
                 const sprite = await getSprites(selectedPokemon.gen, selectedPokemon.species, false);
                 const types = await getType(selectedPokemon.gen, selectedPokemon.species);
                 const moves = selectedPokemon.moves;
-
-                // const heartScales = user.Items.find(item => item.name.toLowerCase() === "heartscale");
 
 
                 let movefields = [];
@@ -144,7 +142,7 @@ module.exports = {
                     )
                     .setThumbnail(sprite)
                     .setColor('#e36d83')
-                    .setFooter({ text: `Rare Candy: ${rarecandy} | 1 RareCandy = 2 Level`, iconURL: 'https://i.postimg.cc/52gBWdNY/image.png' })
+                    .setFooter({ text: `Rare Candy: ${rarecandy} | 1 RareCandy = 1 Level`, iconURL: 'https://i.postimg.cc/52gBWdNY/image.png' })
 
                 const trainRow = new ActionRowBuilder()
                     .addComponents(
@@ -165,17 +163,21 @@ module.exports = {
                             .setLabel('Train')
                             .setStyle('Primary')
                     )
+                    .addComponents(
+                        new ButtonBuilder()
+                            .setCustomId('close_interaction')
+                            .setLabel('Close')
+                            .setStyle('Primary')
+                    )
 
                 // Edit the existing message with the updated embed
-                await interaction.editReply({ embeds: [Pokemon_embed], components: [trainRow] });
-
+                const PokemonInt = await interaction.editReply({ embeds: [Pokemon_embed], components: [trainRow] }); // Send the Pokemon Embed the first time
 
                 const filter = i => i.user.id === interaction.user.id;
                 const trainCollector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 
                 trainCollector.on('collect', async i => {
                     if (i.customId === 'train_pokemon') {
-
 
                         const eligibleMoves = await getAligibleMoves(selectedPokemon.id, userid);
                         const learnedMoves = selectedPokemon.moves
@@ -185,8 +187,6 @@ module.exports = {
                         if (learnedMoves.length === 4) {
                             MoveReplace = true;
                         }
-
-
                         // if (!heartScales && MoveReplace == true) return "You dont have any HeartScales, Collect More."
 
                         if (eligibleMoves.length === 0) {
@@ -226,7 +226,7 @@ module.exports = {
                         let notifMsg = ""
                         let moveComps = []
                         if (MoveReplace == true) {
-                            notifMsg = `***IMPORTANT*** \n This will consume 1 HeartScale, Currently Owned HearScale: `
+                            notifMsg = `***IMPORTANT*** \n Replacing a Move and learning a new one, Select from Below`
                             moveComps = [moveRow, learnedMoveRow]
                         }
                         else {
@@ -235,7 +235,7 @@ module.exports = {
                         }
                         await interaction.editReply({ content: notifMsg, components: moveComps });
 
-                        const trainCollector = interaction.channel.createMessageComponentCollector({
+                        const trainCollectorMove = interaction.channel.createMessageComponentCollector({
                             filter: (i) => i.user.id === interaction.user.id, // Only collect interactions from the user who sent the command
                             time: 60000, // Set a timeout for interaction (optional)
                         });
@@ -243,7 +243,7 @@ module.exports = {
                         let selectedMove; // Variable to store selected move
                         let selectedLearnedMove; // Variable to store selected learned move
 
-                        trainCollector.on('collect', async (i) => {
+                        trainCollectorMove.on('collect', async (i) => {
                             if (i.customId === 'select_move') {
                                 selectedMove = i.values[0]; // Store the selected move value
                             } else if (i.customId === 'select_learned_move' && MoveReplace == true) {
@@ -265,69 +265,66 @@ module.exports = {
                                     components: [] // Remove the menus after selection
                                 });
 
-                            } else {
-                                // Defer the update to inform Discord that the bot is still processing
-                                await i.deferUpdate();
                             }
+                            await trainCollectorMove.stop();
                         });
                     }
                     else if (i.customId === 'levelup_pokemon') {
 
                         let rareCandyAmount
 
-                        if (rarecandy >= 1) {
+                        try {
+                            const RareCandyModal = new ModalBuilder()
+                                .setCustomId('rare_candy_modal')
+                                .setTitle('How Many Rare Candies to use')
 
-                            try {
-                                const RareCandyModal = new ModalBuilder()
-                                    .setCustomId('rare_candy_modal')
-                                    .setTitle('How Many Rare Candies to use')
-
-                                const candyAmount = new TextInputBuilder()
-                                    .setCustomId('candyamount')
-                                    .setLabel("amount")
-                                    .setRequired(true)
-                                    .setStyle(TextInputStyle.Short);
+                            const candyAmount = new TextInputBuilder()
+                                .setCustomId('candyamount')
+                                .setLabel("amount")
+                                .setRequired(true)
+                                .setStyle(TextInputStyle.Short);
 
 
-                                const candyActionRow = new ActionRowBuilder().addComponents(candyAmount);
+                            const candyActionRow = new ActionRowBuilder().addComponents(candyAmount);
 
-                                RareCandyModal.addComponents(candyActionRow)
+                            RareCandyModal.addComponents(candyActionRow)
 
-                                await i.showModal(RareCandyModal);
+                            await i.showModal(RareCandyModal);
 
-                                // Collect a modal submit interaction
-                                const filter = (i) => i.customId === 'rare_candy_modal';
+                            // Collect a modal submit interaction
+                            const filter = (i) => i.customId === 'rare_candy_modal';
 
-                                const modalVals = await i.awaitModalSubmit({ filter, time: 60_000 }).then(async(modal) => {
-                                    const modalComp = modal.fields.fields //(candy => candy.customId === 'candyamount');
-                                    rareCandyAmount = parseInt(modalComp.get('candyamount').value)
-    
-                                    const res = await levelUpPokemon(selectedPokemon.id, userid, rareCandyAmount);
-                                    console.log(res)
-                                    await modal.update(res);
+                            const modalVals = await i.awaitModalSubmit({ filter, time: 60_000 }).then(async (modal) => {
+                                const modalComp = modal.fields.fields //(candy => candy.customId === 'candyamount');
+                                rareCandyAmount = parseInt(modalComp.get('candyamount').value)
 
-                                    user.Items.find(item => item.name.toLowerCase() === "rarecandy").amount -= rareCandyAmount;
+                                const res = await levelUpPokemon(selectedPokemon.id, userid, rareCandyAmount);
+                                console.log(res)
+                                await modal.update(res[0]);
 
-                                    await UserSchema.findOneAndUpdate({ DiscordID: userid }, { Items: user.Items });
+                                user.Items.find(item => item.name.toLowerCase() === "rarecandy").amount -= rareCandyAmount;
 
-                                    const Evolutions = await getEvolutions(selectedPokemon.species.toLowerCase());
-                                    if(!Evolutions) return;
+                                await UserSchema.findOneAndUpdate({ DiscordID: userid }, { Items: user.Items });
 
-                                    if (selectedPokemon.level >= Evolutions.evolvesAt-1) {
-                                        console.log("Evolving Pokemon...")
-                                        // change pokemons species
-                                        await UserSchema.findOneAndUpdate({ DiscordID: userid, "AllPokemons.id": selectedPokemon.id }, { "AllPokemons.$.species": Evolutions.evolvesToSpecies });
-                                        await interaction.editReply(`Pokemon Evolved to ${Evolutions.evolvesToSpecies}`);
-                                    }
+                                const Evolutions = await getEvolutions(selectedPokemon.species.toLowerCase()).catch(error => console.log('getEvolutions errored', error));
+                                if (!Evolutions) return console.log("No Evolutions Found");
 
-                                })
+                                console.log(selectedPokemon.level)
 
-                            }
-                            catch (error) {
-                                console.log(error)
-                            }
+                                if (res[1] > Evolutions.evolvesAt - 1) {
+                                    console.log(Evolutions.evolvesToSpecies)
+                                    console.log("Evolving Pokemon...")
+                                    // change pokemons species
+                                    await UserSchema.findOneAndUpdate({ DiscordID: userid, "AllPokemons.id": selectedPokemon.id }, { "AllPokemons.$.species": Evolutions.evolvesToSpecies });
+                                    await interaction.editReply({content:`Pokemon Evolved to ${Evolutions.evolvesToSpecies}`, components: []});
+                                }
+
+                            })
+
                         }
-
+                        catch (error) {
+                            console.log(error)
+                        }
 
                     }
                     else if (i.customId === 'nickname_pokemon') {
@@ -343,13 +340,16 @@ module.exports = {
                             collector.stop();
                         });
                     }
-                    trainCollector.stop();
+                    else if (i.customId === 'close_interaction') {
+                        trainCollector.stop();
+                        await interaction.editReply({ content: "Interaction Ended", components: [], embeds: []});
+                    }
                 });
-
-
             }
 
-            collector.stop();
         });
+        collector.on('end', collected => {
+            console.log(`Collected ${collected.size} interaction`)
+        })
     }
 };
