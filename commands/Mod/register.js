@@ -58,7 +58,7 @@ module.exports = {
             "", // Gender
             isShiny, // Shiny 
             "", // Item
-            4, // Level
+            5, // Level
             selectedAbility, // Ability // IS Randomized
             {"hp": 1, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 0}, // EVs
             "Quirky", // Nature
