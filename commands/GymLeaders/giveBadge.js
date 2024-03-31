@@ -21,16 +21,16 @@ module.exports = {
 
         const gymLeader = await GymSchema.findOne({ DiscordID: gymLeaderID });
         if (!gymLeader) {
-            return await interaction.editReply({ content: `You are not a Gym Leader` });
+            return await interaction.reply({ content: `You are not a Gym Leader` });
         }
 
         const user = await UserSchema.findOne({ DiscordID: UserDiscordID });
         if (!user) {
-            return await interaction.editReply({ content: `User not found` });
+            return await interaction.reply({ content: `User not found` });
         }
 
         if (user.Badges.includes(gymLeader.Badge)) {
-            return await interaction.editReply({ content: `User already has this Badge` });
+            return await interaction.reply({ content: `User already has this Badge` });
         }
 
         console.log(gymLeader.Badge)
@@ -43,6 +43,6 @@ module.exports = {
 
         await user.save();
 
-        await interaction.editReply({ content: `Badge Given` });
+        await interaction.reply({ content: `Badge Given` });
     }
 }

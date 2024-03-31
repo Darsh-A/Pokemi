@@ -20,13 +20,13 @@ module.exports = {
         const userid = interaction.user.id;
         const user = await UserSchema.findOne({ DiscordID: userid });
 
-        if (!user) return interaction.editReply(`User <@${userid}> Not Registered`);
+        if (!user) return interaction.reply(`User <@${userid}> Not Registered`);
 
         let UserPokemons = user.AllPokemons;
 
         if (searchTerm) {
             UserPokemons = UserPokemons.filter(pokemon => pokemon.species.toLowerCase().includes(searchTerm.toLowerCase()));
-            if (UserPokemons.length === 0) return interaction.editReply(`No Pokemons Found with the name ${searchTerm}`);
+            if (UserPokemons.length === 0) return interaction.reply(`No Pokemons Found with the name ${searchTerm}`);
         }
 
         const totalPages = Math.ceil(UserPokemons.length / pokemonsPerPage);

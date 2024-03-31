@@ -11,11 +11,11 @@ module.exports = {
 
         const userid = interaction.user.id;
         const user = await UserSchema.findOne({ DiscordID : userid });
-        if (!user) return interaction.editReply("User Not Found");
+        if (!user) return interaction.reply("User Not Found");
 
         const userTeam = user.Team;
 
-        if (userTeam.length === 0) return interaction.editReply("No Team Found");
+        if (userTeam.length === 0) return interaction.reply("No Team Found");
 
         const showdownFormat = convertToShowdownFormat(JSON.stringify(userTeam));
 
@@ -24,7 +24,7 @@ module.exports = {
         .setDescription(showdownFormat)
         .setTimestamp()
 
-        return interaction.editReply({ embeds: [embed] });
+        return interaction.reply({ embeds: [embed] });
         
     }
 }

@@ -20,10 +20,10 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (!user) return interaction.editreply(`User <@${UserID}> Not Registered`)
+        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
 
         const userPokemons = user.AllPokemons;
-        if (userPokemons.length === 0) return interaction.editReply(`User <@${UserID}> Has No Pokemons`)
+        if (userPokemons.length === 0) return interaction.reply(`User <@${UserID}> Has No Pokemons`)
 
 
         let poks = [];
@@ -40,6 +40,6 @@ module.exports = {
             .setColor('#b982e0')
             .setTimestamp()
         
-        await interaction.editReply({ embeds: [embed] })
+        await interaction.reply({ embeds: [embed] })
     }
 }

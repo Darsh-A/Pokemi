@@ -34,11 +34,11 @@ module.exports = {
 
         const pokemonExists = checkPokemonExists(StarterPokemonGeneration, StarterPokemonSpecies);
 
-        if (!pokemonExists) return interaction.editReply(`Pokemon ${StarterPokemonSpecies} Not Found in Generation ${StarterPokemonGeneration}`)
+        if (!pokemonExists) return interaction.reply(`Pokemon ${StarterPokemonSpecies} Not Found in Generation ${StarterPokemonGeneration}`)
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (user) return interaction.editReply(`User <@${UserID}> Already Registered`)
+        if (user) return interaction.reply(`User <@${UserID}> Already Registered`)
         
         const moves  = filterMovesByGen(StarterPokemonGeneration, StarterPokemonSpecies);
         const selectedAbility = getAbility(StarterPokemonGeneration, StarterPokemonSpecies)
@@ -83,7 +83,7 @@ module.exports = {
             },
         })
 
-        await interaction.editReply(`User <@${UserID}> Registered`)
+        await interaction.reply(`User <@${UserID}> Registered`)
 
     }
 }

@@ -11,7 +11,7 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: userid });
 
-        if (!user) return interaction.editReply("User Not Found");
+        if (!user) return interaction.reply("User Not Found");
 
         const userPokemons = user.AllPokemons;
         const userTeam = user.Team;
@@ -36,7 +36,7 @@ module.exports = {
         const row = new ActionRowBuilder()
             .addComponents(menu);
 
-        await interaction.editReply({ content: 'Pick a Pokemon for your Team', components: [row] });
+        await interaction.reply({ content: 'Pick a Pokemon for your Team', components: [row] });
 
         const filter = i => i.customId === 'team' && i.user.id === userid;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
@@ -50,7 +50,7 @@ module.exports = {
                 const pokemonMap = new Map(userPokemons.map(pokemon => [pokemon.id, pokemon]));
 
               const pokemon = pokemonMap.get(pokemonID);
-              if (!pokemon) return interaction.editReply("Pokemon Not Found");
+              if (!pokemon) return interaction.reply("Pokemon Not Found");
           
               newTeam.push(pokemon);
           

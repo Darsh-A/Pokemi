@@ -39,10 +39,10 @@ module.exports = {
 
         const pokemonExists = checkPokemonExists(Generation, Species);
 
-        if (!pokemonExists) return interaction.editReply(`Pokemon ${Species} Not Found in Generation ${Generation}`)
+        if (!pokemonExists) return interaction.reply(`Pokemon ${Species} Not Found in Generation ${Generation}`)
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (!user) return interaction.editReply(`User <@${UserID}> Not Registered`)
+        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
 
         const selectedAbility = getAbility(Generation, Species)
 
@@ -75,8 +75,6 @@ module.exports = {
         })
 
         await interaction.reply(`Added ${Species} to <@${UserID}>`)
-
-
 
     }
 }

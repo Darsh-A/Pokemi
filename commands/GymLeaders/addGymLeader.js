@@ -32,7 +32,7 @@ module.exports = {
         const gym = gymData.find(gym => gym.Type.toLowerCase() === type.toLowerCase());
 
         if (!gym) {
-            return await interaction.editReply({ content: `Gym Type not found` });
+            return await interaction.reply({ content: `Gym Type not found` });
         }
 
         const newGym = new GymUser({
@@ -47,7 +47,7 @@ module.exports = {
 
         await newGym.save();
 
-        await interaction.editReply({ content: `Gym Leader Registered` });
+        await interaction.reply({ content: `Gym Leader Registered` });
 
     }
 }

@@ -27,7 +27,7 @@ module.exports = {
         .setColor('#8770fa')
         .setTimestamp();
 
-        await interaction.editReply({embeds: [infoEmbed]});
+        await interaction.reply({embeds: [infoEmbed]});
 
     }
 }

@@ -40,6 +40,6 @@ module.exports = {
             avatarURL: 'https://i.postimg.cc/T1czC6RP/image.png',
         });
 
-        await interaction.editReply(`Sent ${Message} to <#${channel}>`)
+        await interaction.reply(`Sent ${Message} to <#${channel}>`)
     }
 }

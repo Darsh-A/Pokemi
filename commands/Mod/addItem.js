@@ -31,7 +31,7 @@ module.exports = {
         const Amount = parseInt(options.getString('amount'));
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
-        if (!user) return interaction.editReply(`User <@${UserID}> Not Registered`);
+        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`);
 
         const rarecandyIndex = user.Items.findIndex(item => item.name === Item);
 
@@ -40,13 +40,13 @@ module.exports = {
             const newItem = new InvItem(Item, Amount);
             user.Items.push(newItem);
             await UserSchema.updateOne({ DiscordID: UserID }, { Items: user.Items });
-            return interaction.editReply(`Added ${Amount} ${Item} to <@${UserID}>`);
+            return interaction.reply(`Added ${Amount} ${Item} to <@${UserID}>`);
         } else {
             // Item found, update its amount
             const rarecandy = user.Items[rarecandyIndex];
             rarecandy.amount += Amount;
             await UserSchema.updateOne({ DiscordID: UserID }, { Items: user.Items });
-            return interaction.editReply(`Added ${Amount} ${Item} to <@${UserID}>`);
+            return interaction.reply(`Added ${Amount} ${Item} to <@${UserID}>`);
         }
 
 

@@ -14,7 +14,7 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: userid });
         if (!user) {
-            return interaction.editReply('You are not registered');
+            return interaction.reply('You are not registered');
         }
 
         const userTeam = user.Team;

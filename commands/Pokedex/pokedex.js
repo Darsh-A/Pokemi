@@ -47,7 +47,7 @@ module.exports = {
             .setThumbnail('https://i.postimg.cc/T1zJ42PF/pngwing-com.png')
             .setColor('#cc5877')
 
-        await interaction.editReply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] });
 
 
     }

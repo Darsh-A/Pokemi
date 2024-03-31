@@ -25,13 +25,13 @@ module.exports = {
 
         const user = await UserSchema.findOne({ DiscordID: UserID });
 
-        if (!user) return interaction.editReply(`User <@${UserID}> Not Registered`)
+        if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
 
         const userPokemons = user.AllPokemons;
 
         const pokemonIndex = userPokemons.map(pokemon => pokemon.species).lastIndexOf(Pokemon);
 
-        if (pokemonIndex === -1) return interaction.editReply(`Pokemon ${Pokemon} Not Found in <@${UserID}>'s Collection`)
+        if (pokemonIndex === -1) return interaction.reply(`Pokemon ${Pokemon} Not Found in <@${UserID}>'s Collection`)
 
         const removedPokemon = userPokemons[pokemonIndex];
         const newPokemons = [...userPokemons.slice(0, pokemonIndex), ...userPokemons.slice(pokemonIndex + 1)];
@@ -43,6 +43,6 @@ module.exports = {
         const newTeam = userTeam.filter(pokemon => pokemon.id !== removedPokemon.id);
         await UserSchema.findOneAndUpdate({ DiscordID: UserID }, { Team: newTeam });
 
-        await interaction.editReply(`Removed ${Pokemon} from <@${UserID}>`);
+        await interaction.reply(`Removed ${Pokemon} from <@${UserID}>`);
     }
 }
