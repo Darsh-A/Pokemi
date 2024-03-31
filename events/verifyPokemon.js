@@ -26,8 +26,10 @@ module.exports = {
                 }
             ]
         });
+        
 
         UserChangeStream.on('change', async (change) => {
+            console.log(change)
 
 
             const updatedFields = change.updateDescription.updatedFields;
