@@ -29,7 +29,9 @@ module.exports = {
         
 
         UserChangeStream.on('change', async (change) => {
-            console.log(change)
+            const operationType = change.operationType;
+
+            if (operationType !== 'update') return;
 
 
             const updatedFields = change.updateDescription.updatedFields;
