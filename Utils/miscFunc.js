@@ -51,12 +51,17 @@ function giveShiny() {
 
 async function uploadEmoji(interaction, pokemon) {
 
+  console.log(pokemon)
+
   const species = pokemon.species;
   const shiny = pokemon.shiny
   const generation = pokemon.gen
   const pokeID = pokemon.id
 
+  console.log(shiny)
+
   const sprite = await getSprites(generation, species, shiny)
+  console.log(sprite)
 
   const response = await axios.get(sprite, { responseType: 'arraybuffer' });
 

@@ -1,7 +1,10 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits} = require('discord.js');
 const UserSchema = require('../../mongo/Schemas/user');
 const {Pokemon, getAbility, filterMovesByGen, checkMovesForScratchOrTackle, checkPokemonExists, getSprites} = require('../../Utils/UtilityClasses');
 const { generateRandomString, giveShiny } = require('../../Utils/miscFunc.js');
+const {config} = require('dotenv')
+
+config()
 
 
 module.exports = {
@@ -84,6 +87,29 @@ module.exports = {
         })
 
         await interaction.reply(`User <@${UserID}> Registered`)
+
+        // Adding user to their channel
+
+        const client = interaction.client;
+        const guild = interaction.guild;
+        const category = guild.channels.fetch(process.env.userchannelCatId)
+
+        const userChannel = guild.channels.create({
+            name: UserID,
+            parent: category,
+            permissionOverwrites: [
+                {
+                    id: UserID,
+                    allow: [PermissionFlagsBits.ViewChannel]
+                },
+                {
+                    id: guild.id,
+                    deny: [PermissionFlagsBits.ViewChannel]
+                }
+            ]
+
+        })
+
 
     }
 }

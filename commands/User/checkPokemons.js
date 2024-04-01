@@ -147,12 +147,6 @@ module.exports = {
                 const trainRow = new ActionRowBuilder()
                     .addComponents(
                         new ButtonBuilder()
-                            .setCustomId('nickname_pokemon')
-                            .setLabel('NickName')
-                            .setStyle('Primary')
-                    )
-                    .addComponents(
-                        new ButtonBuilder()
                             .setCustomId('levelup_pokemon')
                             .setLabel('LevelUp')
                             .setStyle('Primary')
@@ -326,19 +320,6 @@ module.exports = {
                             console.log(error)
                         }
 
-                    }
-                    else if (i.customId === 'nickname_pokemon') {
-
-                        const nickname = await interaction.channel.send(`Enter Nickname for ${selectedPokemon.species}`);
-                        const filter = m => m.author.id === interaction.user.id;
-                        const collector = interaction.channel.createMessageCollector({ filter, time: 60000 });
-
-                        collector.on('collect', async (m) => {
-                            const nickname = m.content;
-                            const response = await UserSchema.findOneAndUpdate({ DiscordID: userid, "AllPokemons.id": selectedPokemon.id }, { "AllPokemons.$.name": nickname });
-                            await interaction.editReply(`Nickname Updated to ${nickname}`);
-                            collector.stop();
-                        });
                     }
                     else if (i.customId === 'close_interaction') {
                         trainCollector.stop();

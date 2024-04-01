@@ -150,7 +150,7 @@ async function getSprites(gen, species, shiny) {
     const spriteUrl = response.data.sprites.other.showdown.front_default;
     const shinySprite = response.data.sprites.other.showdown.front_shiny;
 
-    if (shiny) {
+    if (shiny == "Yes") {
         return shinySprite;
     } else {
         return spriteUrl;

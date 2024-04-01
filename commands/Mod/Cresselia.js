@@ -24,22 +24,27 @@ module.exports = {
 
         const options = interaction.options;
         const Message = options.getString('message');
-        const channel = options.getString('channel');
+        const channelID = options.getString('channel');
 
-        const webhookClient = new WebhookClient({ id: CresseliaID, token: CresseliaToken });
+        const client = interaction.client;
+        const channel = await client.channels.fetch(channelID);
+        const webhook = await client.fetchWebhook(CresseliaID, CresseliaToken)
 
-        webhookClient.edit({
+        interaction.reply("Sending...")
+
+
+        await webhook.edit({
             name: 'Cresselia',
             avatar: 'https://i.postimg.cc/T1czC6RP/image.png',
             channel: channel,
         })
         
-        webhookClient.send({
+        webhook.send({
             content: Message,
             username: 'Cresselia',
             avatarURL: 'https://i.postimg.cc/T1czC6RP/image.png',
         });
 
-        await interaction.reply(`Sent ${Message} to <#${channel}>`)
+        await interaction.editReply("Sent.")
     }
 }

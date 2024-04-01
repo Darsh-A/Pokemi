@@ -12,6 +12,8 @@ module.exports = {
         const userid = interaction.user.id;
         const channel = interaction.channel;
 
+        await interaction.deferReply();
+
         const user = await UserSchema.findOne({ DiscordID: userid });
         if (!user) {
             return interaction.reply('You are not registered');
@@ -62,14 +64,14 @@ module.exports = {
                 );
             }
         }
-
+        
         const embed = new EmbedBuilder()
             .setTitle(`${interaction.user.username}`)
             .setDescription(`Badges: \n${userBadgesFields.join('')} \n\nTeam: \n ${teamInfoFields.join('')} \nItems: \n${userItemsFields.join('')} \n\nMoney: \n${user.Money} \n\n`) 
             .setThumbnail(interaction.user.avatarURL())
             .setTimestamp()
             .setColor('#f76084');
-        await channel.send({ embeds: [embed] });
+        await interaction.editReply({ embeds: [embed] });
 
         for (const ids of emojiIDs) {
             await deleteEmoji(interaction, ids);
