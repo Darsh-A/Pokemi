@@ -46,27 +46,13 @@ class Badges {
 }
 
 
+async function getAbility(gen, species) {
+    const gene = gen;
+    const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${species.toLowerCase()}`);
+    const abilities = response.data.abilities;
 
-
-function getAbility(gen, species) {
-
-    const gens = new Generations(Dex);
-    const Pokemon = gens.get(gen).species.get(species);
-
-    if (!Pokemon) return "No Pokemon Found";
-
-    const abilities = Pokemon.abilities;
-
-    // Get the list of ability keys (either numeric or the letter)
-    const abilityKeys = Object.keys(abilities);
-
-    // Choose a random index within the keys array
-    const randomIndex = Math.floor(Math.random() * abilityKeys.length);
-
-    // Access the corresponding ability using the random key
-    const chosenAbility = abilities[abilityKeys[randomIndex]];
-
-    return chosenAbility;
+    const ability = abilities[Math.floor(Math.random() * abilities.length)].ability.name;
+    return ability.toString();
 }
 
 function checkPokemonExists(gen, species) {

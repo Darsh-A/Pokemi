@@ -82,7 +82,8 @@ module.exports = {
                         console.log(`New Pokemon added for user ${userId}: ${species}`);
 
                         const moves = filterMovesByGen(generation, species);
-                        const selectedAbility = getAbility(generation, species);
+                        const selectedAbility = await getAbility(generation, species.toLowerCase());
+                        console.log(selectedAbility);
                         const preferredMove = checkMovesForScratchOrTackle(moves);
 
                         const isShiny = giveShiny();

@@ -171,7 +171,11 @@ module.exports = {
                 const trainCollector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
 
                 trainCollector.on('collect', async i => {
+
                     if (i.customId === 'train_pokemon') {
+
+                        trainCollector.stop();
+                        await i.deferUpdate()
 
                         const eligibleMoves = await getAligibleMoves(selectedPokemon.id, userid);
                         const learnedMoves = selectedPokemon.moves
@@ -180,8 +184,8 @@ module.exports = {
 
                         if (learnedMoves.length === 4) {
                             MoveReplace = true;
+                            console.log("MoveReplace: ", MoveReplace)
                         }
-                        // if (!heartScales && MoveReplace == true) return "You dont have any HeartScales, Collect More."
 
                         if (eligibleMoves.length === 0) {
                             return 'No Moves Found';
@@ -221,7 +225,7 @@ module.exports = {
                         let moveComps = []
                         if (MoveReplace == true) {
                             notifMsg = `***IMPORTANT*** \n Replacing a Move and learning a new one, Select from Below`
-                            moveComps = [moveRow, learnedMoveRow]
+                            moveComps = [learnedMoveRow, moveRow]
                         }
                         else {
                             notifMsg = `Learning a New Move, Select from Below`
@@ -238,29 +242,37 @@ module.exports = {
                         let selectedLearnedMove; // Variable to store selected learned move
 
                         trainCollectorMove.on('collect', async (i) => {
+                            i.deferUpdate();
                             if (i.customId === 'select_move') {
-                                selectedMove = i.values[0]; // Store the selected move value
+                                selectedMove = i.values[0];
                             } else if (i.customId === 'select_learned_move' && MoveReplace == true) {
-                                selectedLearnedMove = i.values[0]; // Store the selected learned move value
+                                selectedLearnedMove = i.values[0];
+                            }
+
+                            console.log(selectedMove, selectedLearnedMove, MoveReplace)
+
+                            if (selectedMove) {
+                                // Do Nothing wait for the second response
                             }
 
                             // Check if both selections are made
-                            if (selectedMove && selectedLearnedMove || selectedMove && MoveReplace == false) {
+                            if (selectedMove && (MoveReplace == false || selectedLearnedMove)){
 
-                                // Your logic for handling the selected moves and updating user data
-                                // ... (e.g., train the Pokemon, replace the learned move)
-                                const learnResponse = await trainPokemon(selectedPokemon.id, userid, selectedLearnedMove, selectedMove, MoveReplace);
+                                await trainCollectorMove.stop();
 
-                                // Stop the collector after handling selections
-                                trainCollector.stop();
+                                if (MoveReplace == true && !selectedLearnedMove) {
+                                    await i.reply({ content: "Please Select a Move to Forget", ephemeral: true });
+                                }
+                                else {
+                                    const learnResponse = await trainPokemon(selectedPokemon.id, userid, selectedLearnedMove, selectedMove, MoveReplace);
+                                    console.log(learnResponse)
 
-                                await interaction.editReply({
-                                    content: learnResponse, // Send the response to the user
-                                    components: [] // Remove the menus after selection
-                                });
-
+                                    await interaction.editReply({
+                                        content: learnResponse, // Send the response to the user
+                                        components: [] // Remove the menus after selection
+                                    });
+                                }
                             }
-                            await trainCollectorMove.stop();
                         });
                     }
                     else if (i.customId === 'levelup_pokemon') {
@@ -310,7 +322,7 @@ module.exports = {
                                     console.log("Evolving Pokemon...")
                                     // change pokemons species
                                     await UserSchema.findOneAndUpdate({ DiscordID: userid, "AllPokemons.id": selectedPokemon.id }, { "AllPokemons.$.species": Evolutions.evolvesToSpecies });
-                                    await interaction.editReply({content:`Pokemon Evolved to ${Evolutions.evolvesToSpecies}`, components: []});
+                                    await interaction.editReply({ content: `Pokemon Evolved to ${Evolutions.evolvesToSpecies}`, components: [] });
                                 }
 
                             })
@@ -323,7 +335,7 @@ module.exports = {
                     }
                     else if (i.customId === 'close_interaction') {
                         trainCollector.stop();
-                        await interaction.editReply({ content: "Interaction Ended", components: [], embeds: []});
+                        await interaction.editReply({ content: "Interaction Ended", components: [], embeds: [] });
                     }
                 });
             }

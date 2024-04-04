@@ -88,22 +88,22 @@ async function updatePokemon(pokemon) {
   const isShiny = giveShiny();
   const sprite = await getSprites(gen, species, isShiny);
 
+  console.log(abilities, isShiny, sprite)
+
   if (undefinedFields.includes('sprite')) {
-    console.log("Adding Sprite")
+    console.log("Adding Sprite", sprite || null)
     pokemonData.sprite = sprite;
   }
 
   if (undefinedFields.includes('ability')) {
-    console.log("Adding Ability")
+    console.log("Adding Ability", abilities || null)
     pokemonData.ability = abilities;
   }
 
   if (undefinedFields.includes('shiny')) {
-    console.log("Adding Shiny")
+    console.log("Adding Shiny", isShiny || null)
     pokemonData.shiny = isShiny;
   }
-
-  console.log(pokemonData);
 
   const updatedUser = await UserSchema.findOneAndUpdate(
     { DiscordID: discordID, 'AllPokemons.id': pokemon.id },

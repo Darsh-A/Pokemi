@@ -22,7 +22,7 @@ module.exports = {
 
         if (!user) return interaction.reply(`User <@${UserID}> Not Registered`)
 
-        const userPokemons = user.AllPokemons;
+        const userPokemons = user.Team;
         if (userPokemons.length === 0) return interaction.reply(`User <@${UserID}> Has No Pokemons`)
 
 
