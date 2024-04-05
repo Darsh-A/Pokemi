@@ -49,9 +49,10 @@ for (const file of eventFiles) {
 	}
 }
 
-const UserSchema = require('./mongo/Schemas/user');
-const { Pokemon, checkPokemonExists, filterMovesByGen, getAbility, checkMovesForScratchOrTackle, getSprites } = require('./Utils/UtilityClasses');
-const { giveShiny } = require('./Utils/miscFunc.js');
+//Posting Errors
+process.on("unhandledRejection", async(error) => {
+	console.log(`An error occured: ${error}`);
+  })
 
 client.emit('verifyPokemon');
 
