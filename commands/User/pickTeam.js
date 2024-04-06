@@ -33,7 +33,7 @@ module.exports = {
           value: pokemon.id
         })))
         .setMinValues(1)
-        .setMaxValues(Math.min(pokemons.length, pageSize));
+        .setMaxValues(Math.min(6, pageSize));
     }
 
     const menu = createMenu(getPokemonForPage(currentPage));
