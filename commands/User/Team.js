@@ -146,5 +146,7 @@ module.exports = {
 
         await user.save();
 
+        await interaction.reply("Team Updated Successfully");
+
     }
 }
