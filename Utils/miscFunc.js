@@ -101,7 +101,7 @@ async function levelup(discordID) {
 
     pokemon.defeatCount += 1;
 
-    if (pokemon.defeatCount % 2 === 0) {
+    if (pokemon.defeatCount % 1 === 0) {
       pokemon.level += 1;
     }
 
