@@ -68,6 +68,7 @@ module.exports = {
 
         const team = [];
 
+
         if (PokemonFirst) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonFirst && pokemon.level > highest.level ? pokemon : highest,
@@ -145,8 +146,6 @@ module.exports = {
         user.Team = team;
 
         await user.save();
-
-        await 
 
     }
 }
