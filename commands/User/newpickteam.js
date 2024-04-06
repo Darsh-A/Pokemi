@@ -43,6 +43,7 @@ module.exports = {
                 })))
                 .setMinValues(1)
                 .setMaxValues(maxValues);
+                
         }
 
         const menu = createMenu(getPokemonForPage(currentPage));
