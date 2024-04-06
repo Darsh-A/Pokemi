@@ -69,7 +69,7 @@ module.exports = {
         const team = [];
 
         const highestLevelPokemonfirst = user.AllPokemons
-            .filter(pokemon => pokemon.name === PokemonFirst)  // Filter by matching name
+            .filter(pokemon => pokemon.species === PokemonFirst)  // Filter by matching name
             .sort((a, b) => b.level - a.level)[0];  // Sort by level in descending order and get the highest level
 
         if (!highestLevelPokemonfirst) {
@@ -80,7 +80,7 @@ module.exports = {
 
         if (PokemonSecond) {
             const highestLevelPokemonSecond = user.AllPokemons
-                .filter(pokemon => pokemon.name === PokemonSecond)
+                .filter(pokemon => pokemon.species === PokemonSecond)
                 .sort((a, b) => b.level - a.level)[0];
 
             if (!highestLevelPokemonSecond) {
@@ -92,7 +92,7 @@ module.exports = {
 
         if (PokemonThird) {
             const highestLevelPokemonThird = user.AllPokemons
-                .filter(pokemon => pokemon.name === PokemonThird)
+                .filter(pokemon => pokemon.species === PokemonThird)
                 .sort((a, b) => b.level - a.level)[0];
 
             if (!highestLevelPokemonThird) {
@@ -104,7 +104,7 @@ module.exports = {
 
         if (PokemonFourth) {
             const highestLevelPokemonFourth = user.AllPokemons
-                .filter(pokemon => pokemon.name === PokemonFourth)
+                .filter(pokemon => pokemon.species === PokemonFourth)
                 .sort((a, b) => b.level - a.level)[0];
 
             if (!highestLevelPokemonFourth) {
@@ -116,7 +116,7 @@ module.exports = {
 
         if (PokemonFifth) {
             const highestLevelPokemonFifth = user.AllPokemons
-                .filter(pokemon => pokemon.name === PokemonFifth)
+                .filter(pokemon => pokemon.species === PokemonFifth)
                 .sort((a, b) => b.level - a.level)[0];
 
             if (!highestLevelPokemonFifth) {
@@ -128,7 +128,7 @@ module.exports = {
 
         if (PokemonSixth) {
             const highestLevelPokemonSixth = user.AllPokemons
-                .filter(pokemon => pokemon.name === PokemonSixth)
+                .filter(pokemon => pokemon.species === PokemonSixth)
                 .sort((a, b) => b.level - a.level)[0];
 
             if (!highestLevelPokemonSixth) {
@@ -138,16 +138,13 @@ module.exports = {
             team.push(highestLevelPokemonSixth);
         }
 
+        console.log("Team: ", team);
+
         // update the user's team
 
         user.Team = team;
 
         await user.save();
-
-        
-
-
-
 
     }
 }
