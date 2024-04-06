@@ -90,14 +90,14 @@ module.exports = {
             const updatedMenu = createMenu(getPokemonForPage(currentPage));
             previousButton.setDisabled(currentPage === 1);
             nextButton.setDisabled(false);
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton,confirmButton)] });
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
 
           } else if (i.customId === 'next_page') {
             currentPage++;
             const updatedMenu = createMenu(getPokemonForPage(currentPage));
             previousButton.setDisabled(false);
             nextButton.setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize));
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton,confirmButton)] });
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
 
           } else if (i.customId === 'confirm_team') {
 
