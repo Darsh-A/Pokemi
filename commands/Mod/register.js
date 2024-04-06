@@ -80,7 +80,7 @@ module.exports = {
             AllMoves: [],
             Team: [StarterPokemon],
             WildRef: {
-                lastGymLow: 0,
+                lastGymLow: 5,
                 nextGymLow: 12
             
             },
@@ -91,15 +91,16 @@ module.exports = {
         // Adding user to their channel
 
         const client = interaction.client;
-        const guild = interaction.guild;
-        const category = guild.channels.fetch(process.env.userchannelCatId)
+        const guild = await interaction.guild;
+        const User = await guild.members.fetch(UserID);
+        const category = await guild.channels.fetch(process.env.userchannelCatId)
 
-        const userChannel = guild.channels.create({
-            name: UserID,
+        const userChannel = await guild.channels.create({
+            name: User.id,
             parent: category,
             permissionOverwrites: [
                 {
-                    id: UserID,
+                    id: User.id,
                     allow: [PermissionFlagsBits.ViewChannel]
                 },
                 {
@@ -109,6 +110,8 @@ module.exports = {
             ]
 
         })
+
+        console.log(userChannel)
 
 
     }

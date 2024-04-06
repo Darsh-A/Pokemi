@@ -28,6 +28,7 @@ module.exports = {
 
         const client = interaction.client;
         const channel = await client.channels.fetch(channelID);
+        if (!channel) return interaction.reply("Channel Not Found or Invalid ID.")
         const webhook = await client.fetchWebhook(CresseliaID, CresseliaToken)
 
         interaction.reply("Sending...")

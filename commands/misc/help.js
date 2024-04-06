@@ -13,6 +13,7 @@ module.exports = {
             {name: `pickteam`,value: `Pick a Team of upto 6 Pokemons for Battle`},
             {name: `battle`,value: `Gives Pokemon-Showdown Import data for your selected Team`},
             {name: `pokemons`,value: `Gives list of all your pokemons\nCan also be used to Train Pokemons`},
+            {name: `verifypokemons`,value: `Fecthes Missing parameters for your pokemons like ability and sprites`},
             {name: `info`,value: `Gives info about your profile`},
             {name: `pokedex`,value: `Well its a Pokedex duh`},
             {name: `moveinfo`,value: `Shows Info about a move`},
