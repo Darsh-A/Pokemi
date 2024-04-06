@@ -72,6 +72,7 @@ module.exports = {
 
         const filter = (i) => i.user.id === userid;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
+
         let selectedPokemonIDs = [];
 
         collector.on('collect', async (i) => {
@@ -83,19 +84,23 @@ module.exports = {
             confirmButton.setDisabled(selectedPokemonIDs.length === 0);
         
             await interaction.editReply({ components: [row1, row2.setComponents(previousButton, nextButton, confirmButton)] });
+
           } else if (i.customId === 'prev_page') {
             currentPage--;
             const updatedMenu = createMenu(getPokemonForPage(currentPage));
             previousButton.setDisabled(currentPage === 1);
             nextButton.setDisabled(false);
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton,confirmButton)] });
+
           } else if (i.customId === 'next_page') {
             currentPage++;
             const updatedMenu = createMenu(getPokemonForPage(currentPage));
             previousButton.setDisabled(false);
             nextButton.setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize));
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton,confirmButton)] });
+
           } else if (i.customId === 'confirm_team') {
+
             const newTeam = [];
             for (const pokemonID of selectedPokemonIDs) {
               const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID);
@@ -108,8 +113,6 @@ module.exports = {
             
             // Update user's team in MongoDB
             await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
-            
-            // You might want to consider adding additional logic here to handle successful/unsuccessful updates (e.g., informing the user)
             
             await interaction.editReply("Your team has been updated!");
             // Reset state for next selection
