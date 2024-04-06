@@ -93,7 +93,12 @@ module.exports = {
         const client = interaction.client;
         const guild = await interaction.guild;
         const User = await guild.members.fetch(UserID);
-        const globalName = User.globalName || User.username || User.id;
+        console.log(User)
+        let globalName = User.user.globalName;
+        console.log(globalName)
+        if(!globalName) {
+            globalName = User.id;
+        }
 
         const category = await guild.channels.fetch(process.env.userchannelCatId)
 
@@ -112,9 +117,6 @@ module.exports = {
             ]
 
         })
-
-        console.log(userChannel)
-
 
     }
 }
