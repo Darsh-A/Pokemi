@@ -56,15 +56,14 @@ module.exports = {
             .setLabel('Next')
             .setStyle(ButtonStyle.Primary)
             .setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize)); // Disable on last pag
+        const confirmButton = new ButtonBuilder()
+            .setCustomId('confirm_team') // Ensure this ID is unique
+            .setLabel('Confirm Team')
+            .setStyle(ButtonStyle.Success)
+            .setDisabled(true); // Initially disabled
 
         const row1 = new ActionRowBuilder().addComponents(menu);
-        const row2 = new ActionRowBuilder().addComponents(previousButton, nextButton)
-            .addComponents(previousButton, nextButton, new ButtonBuilder()
-                .setCustomId('confirm_team')
-                .setLabel('Confirm Team')
-                .setStyle(ButtonStyle.Success)
-                .setDisabled(true) // Initially disabled
-            );
+        const row2 = new ActionRowBuilder().addComponents(previousButton, nextButton, confirmButton)
 
 
         await interaction.reply({ content: 'Pick a Pokemon for your Team', components: [row1, row2] });
