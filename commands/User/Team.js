@@ -71,7 +71,7 @@ module.exports = {
         if (PokemonFirst) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonFirst && pokemon.level > highest.level ? pokemon : highest,
-                {});
+                {level: -Infinity});
 
             if (highestLevelPokemon) {
                 team.push(highestLevelPokemon);
@@ -83,7 +83,7 @@ module.exports = {
         if (PokemonSecond) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonSecond && pokemon.level > highest.level ? pokemon : highest,
-                {});
+                {level: -Infinity});
 
             if (highestLevelPokemon) {
                 team.push(highestLevelPokemon);
@@ -95,7 +95,7 @@ module.exports = {
         if (PokemonThird) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonThird && pokemon.level > highest.level ? pokemon : highest,
-                {});
+                {level: -Infinity});
 
             if (highestLevelPokemon) {
                 team.push(highestLevelPokemon);
@@ -107,7 +107,7 @@ module.exports = {
         if (PokemonFourth) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonFourth && pokemon.level > highest.level ? pokemon : highest,
-                {});
+                {level: -Infinity});
 
             if (highestLevelPokemon) {
                 team.push(highestLevelPokemon);
@@ -119,7 +119,7 @@ module.exports = {
         if (PokemonFifth) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonFifth && pokemon.level > highest.level ? pokemon : highest,
-                {});
+                {level: -Infinity});
 
             if (highestLevelPokemon) {
                 team.push(highestLevelPokemon);
@@ -131,7 +131,7 @@ module.exports = {
         if (PokemonSixth) {
             const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
                 pokemon.species === PokemonSixth && pokemon.level > highest.level ? pokemon : highest,
-                {});
+                {level: -Infinity});
 
             if (highestLevelPokemon) {
                 team.push(highestLevelPokemon);
@@ -145,6 +145,8 @@ module.exports = {
         user.Team = team;
 
         await user.save();
+
+        await 
 
     }
 }
