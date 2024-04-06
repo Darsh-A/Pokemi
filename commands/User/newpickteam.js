@@ -6,6 +6,8 @@ module.exports = {
         .setName('newpickteam')
         .setDescription('Pick a Team for Battle'),
     async execute(interaction) {
+
+        await interaction.deferReply();
         const userid = interaction.user.id;
 
         const user = await UserSchema.findOne({ DiscordID: userid });
