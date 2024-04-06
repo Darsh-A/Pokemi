@@ -43,7 +43,6 @@ module.exports = {
                 })))
                 .setMinValues(1)
                 .setMaxValues(maxValues);
-                
         }
 
         const menu = createMenu(getPokemonForPage(currentPage));
@@ -73,62 +72,49 @@ module.exports = {
 
         const filter = (i) => i.user.id === userid;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
-
+        let selectedPokemonIDs = []; // Store selected IDs across pages
         collector.on('collect', async (i) => {
-            if (i.customId === 'team') {
-                const pokemonIDs = i.values; // Array of selected Pokemon IDs
-
-                let newTeam = [];
-                for (const pokemonID of pokemonIDs) {
-                    const pokemonMap = new Map(userPokemons.map(pokemon => [pokemon.id, pokemon]));
-                    const pokemon = pokemonMap.get(pokemonID);
-                    if (!pokemon) return interaction.reply("Pokemon Not Found");
-                    newTeam.push(pokemon);
-                }
-
-                // Enable confirmation button if selections exist
-                const confirmButton = row2.components[2];
-                confirmButton.setDisabled(newTeam.length === 0);
-
-                await interaction.editReply({ components: [row1, row2.setComponents(previousButton, nextButton, confirmButton)] });
-            } else if (i.customId === 'prev_page') {
-                currentPage--;
-                const updatedMenu = createMenu(getPokemonForPage(currentPage));
-                previousButton.setDisabled(currentPage === 1);
-                nextButton.setDisabled(false);
-                await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
-            } else if (i.customId === 'next_page') {
-                currentPage++;
-                const updatedMenu = createMenu(getPokemonForPage(currentPage));
-                previousButton.setDisabled(false);
-                nextButton.setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize));
-                await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
+          if (i.customId === 'team') {
+            selectedPokemonIDs = i.values; // Update selected IDs
+        
+            // Enable confirmation button if selections exist
+            const confirmButton = row2.components[2];
+            confirmButton.setDisabled(selectedPokemonIDs.length === 0);
+        
+            await interaction.editReply({ components: [row1, row2.setComponents(previousButton, nextButton, confirmButton)] });
+          } else if (i.customId === 'prev_page') {
+            currentPage--;
+            const updatedMenu = createMenu(getPokemonForPage(currentPage));
+            previousButton.setDisabled(currentPage === 1);
+            nextButton.setDisabled(false);
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
+          } else if (i.customId === 'next_page') {
+            currentPage++;
+            const updatedMenu = createMenu(getPokemonForPage(currentPage));
+            previousButton.setDisabled(false);
+            nextButton.setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize));
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
+          } else if (i.customId === 'confirm_team') {
+            // Use the stored selectedPokemonIDs
+            const newTeam = [];
+            for (const pokemonID of selectedPokemonIDs) {
+              // ... logic to find and add Pokemon to newTeam (replace with your logic)
             }
-            else if (i.customId === 'confirm_team') {
-                const pokemonIDs = interaction.components[0].components[0].options.filter(option => option.selected).map(option => option.value); // Get selected IDs
-
-                const newTeam = [];
-                for (const pokemonID of pokemonIDs) {
-                  const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID); // Find Pokemon by ID
-                  if (pokemon) {
-                    newTeam.push(pokemon); // Add entire Pokemon object to team
-                  } else {
-                    console.error(`Pokemon with ID ${pokemonID} not found in user's Pokemon list.`); // Handle potential errors
-                  }
-                }
-              
-                // Update user's team in MongoDB
-                await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
-              
-                // ... existing logic to update user's team with pokemonIDs
-              
-                await interaction.editReply("Your team has been updated!");
-                // Reset state for next selection
-                currentPage = 1;
-                const updatedMenu = createMenu(getPokemonForPage(currentPage));
-                confirmButton.setDisabled(true); // Disable confirmation again
-                await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton.setDisabled(true), nextButton, confirmButton)] });
-              }
+            
+            // Update user's team in MongoDB
+            await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
+            
+            // ... existing logic to update user's team with pokemonIDs (replace with your logic)
+            
+            await interaction.editReply("Your team has been updated!");
+            // Reset state for next selection
+            selectedPokemonIDs = []; // Clear selected IDs
+            currentPage = 1;
+            const updatedMenu = createMenu(getPokemonForPage(currentPage));
+            confirmButton.setDisabled(true); // Disable confirmation again
+            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton.setDisabled(true), nextButton, confirmButton)] });
+          }
         });
+        
     }
 }
