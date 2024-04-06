@@ -93,10 +93,12 @@ module.exports = {
         const client = interaction.client;
         const guild = await interaction.guild;
         const User = await guild.members.fetch(UserID);
+        const globalName = User.globalName || User.username || User.id;
+
         const category = await guild.channels.fetch(process.env.userchannelCatId)
 
         const userChannel = await guild.channels.create({
-            name: User.id,
+            name: globalName,
             parent: category,
             permissionOverwrites: [
                 {
