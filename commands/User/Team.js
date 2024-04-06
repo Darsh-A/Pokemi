@@ -68,85 +68,86 @@ module.exports = {
 
         const team = [];
 
+        const highestLevelPokemonfirst = user.AllPokemons
+            .filter(pokemon => pokemon.name === PokemonFirst)  // Filter by matching name
+            .sort((a, b) => b.level - a.level)[0];  // Sort by level in descending order and get the highest level
 
-        if (PokemonFirst) {
-            const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
-                pokemon.species === PokemonFirst && pokemon.level > highest.level ? pokemon : highest,
-                {level: -Infinity});
-
-            if (highestLevelPokemon) {
-                team.push(highestLevelPokemon);
-            } else {
-                return interaction.reply("You don't have a Pokémon named " + PokemonFirst);
-            }
+        if (!highestLevelPokemonfirst) {
+            return interaction.reply(`No Pokemon named ${PokemonFirst} found in your party.`);
         }
 
-        if (PokemonSecond) {
-            const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
-                pokemon.species === PokemonSecond && pokemon.level > highest.level ? pokemon : highest,
-                {level: -Infinity});
+        team.push(highestLevelPokemonfirst);
 
-            if (highestLevelPokemon) {
-                team.push(highestLevelPokemon);
-            } else {
-                return interaction.reply("You don't have a Pokémon named " + PokemonSecond);
+        if (PokemonSecond) {
+            const highestLevelPokemonSecond = user.AllPokemons
+                .filter(pokemon => pokemon.name === PokemonSecond)
+                .sort((a, b) => b.level - a.level)[0];
+
+            if (!highestLevelPokemonSecond) {
+                return interaction.reply(`No Pokemon named ${PokemonSecond} found in your party.`);
             }
+
+            team.push(highestLevelPokemonSecond);
         }
 
         if (PokemonThird) {
-            const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
-                pokemon.species === PokemonThird && pokemon.level > highest.level ? pokemon : highest,
-                {level: -Infinity});
+            const highestLevelPokemonThird = user.AllPokemons
+                .filter(pokemon => pokemon.name === PokemonThird)
+                .sort((a, b) => b.level - a.level)[0];
 
-            if (highestLevelPokemon) {
-                team.push(highestLevelPokemon);
-            } else {
-                return interaction.reply("You don't have a Pokémon named " + PokemonThird);
+            if (!highestLevelPokemonThird) {
+                return interaction.reply(`No Pokemon named ${PokemonThird} found in your party.`);
             }
+
+            team.push(highestLevelPokemonThird);
         }
 
         if (PokemonFourth) {
-            const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
-                pokemon.species === PokemonFourth && pokemon.level > highest.level ? pokemon : highest,
-                {level: -Infinity});
+            const highestLevelPokemonFourth = user.AllPokemons
+                .filter(pokemon => pokemon.name === PokemonFourth)
+                .sort((a, b) => b.level - a.level)[0];
 
-            if (highestLevelPokemon) {
-                team.push(highestLevelPokemon);
-            } else {
-                return interaction.reply("You don't have a Pokémon named " + PokemonFourth);
+            if (!highestLevelPokemonFourth) {
+                return interaction.reply(`No Pokemon named ${PokemonFourth} found in your party.`);
             }
+
+            team.push(highestLevelPokemonFourth);
         }
 
         if (PokemonFifth) {
-            const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
-                pokemon.species === PokemonFifth && pokemon.level > highest.level ? pokemon : highest,
-                {level: -Infinity});
+            const highestLevelPokemonFifth = user.AllPokemons
+                .filter(pokemon => pokemon.name === PokemonFifth)
+                .sort((a, b) => b.level - a.level)[0];
 
-            if (highestLevelPokemon) {
-                team.push(highestLevelPokemon);
-            } else {
-                return interaction.reply("You don't have a Pokémon named " + PokemonFifth);
+            if (!highestLevelPokemonFifth) {
+                return interaction.reply(`No Pokemon named ${PokemonFifth} found in your party.`);
             }
+
+            team.push(highestLevelPokemonFifth);
         }
 
         if (PokemonSixth) {
-            const highestLevelPokemon = allPokemons.reduce((highest, pokemon) =>
-                pokemon.species === PokemonSixth && pokemon.level > highest.level ? pokemon : highest,
-                {level: -Infinity});
+            const highestLevelPokemonSixth = user.AllPokemons
+                .filter(pokemon => pokemon.name === PokemonSixth)
+                .sort((a, b) => b.level - a.level)[0];
 
-            if (highestLevelPokemon) {
-                team.push(highestLevelPokemon);
-            } else {
-                return interaction.reply("You don't have a Pokémon named " + PokemonSixth);
+            if (!highestLevelPokemonSixth) {
+                return interaction.reply(`No Pokemon named ${PokemonSixth} found in your party.`);
             }
+
+            team.push(highestLevelPokemonSixth);
         }
 
-        // update users team
+        // update the user's team
 
         user.Team = team;
-        
 
         await user.save();
+
+        
+
+
+
 
     }
 }
