@@ -57,12 +57,12 @@ module.exports = {
 
         const options = interaction.options;
 
-        const PokemonFirst = options.getString('first');
-        const PokemonSecond = options.getString('second');
-        const PokemonThird = options.getString('third');
-        const PokemonFourth = options.getString('fourth');
-        const PokemonFifth = options.getString('fifth');
-        const PokemonSixth = options.getString('sixth');
+        const PokemonFirst = options.getString('first').toLowerCase();
+        const PokemonSecond = options.getString('second').toLowerCase();
+        const PokemonThird = options.getString('third').toLowerCase();
+        const PokemonFourth = options.getString('fourth').toLowerCase();
+        const PokemonFifth = options.getString('fifth').toLowerCase();
+        const PokemonSixth = options.getString('sixth').toLowerCase();
 
         // get the pokemon object with the options but the highest level ones only
 
