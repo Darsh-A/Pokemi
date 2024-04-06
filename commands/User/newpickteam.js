@@ -68,12 +68,12 @@ module.exports = {
         const row2 = new ActionRowBuilder().addComponents(previousButton, nextButton, confirmButton)
 
 
-        await interaction.reply({ content: 'Pick a Pokemon for your Team', components: [row1, row2] });
+        await interaction.editReply({ content: 'Pick a Pokemon for your Team', components: [row1, row2] });
 
         const filter = (i) => i.user.id === userid;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
         let selectedPokemonIDs = [];
-        
+
         collector.on('collect', async (i) => {
           if (i.customId === 'team') {
             selectedPokemonIDs = i.values; // Update selected IDs
