@@ -25,6 +25,7 @@ module.exports = {
     }
 
     function createMenu(pokemons) {
+        const maxValues = Math.min(pokemons.length, 6);
       return new StringSelectMenuBuilder()
         .setCustomId('team')
         .setPlaceholder('Select a Pokemon')
@@ -33,7 +34,7 @@ module.exports = {
           value: pokemon.id
         })))
         .setMinValues(1)
-        .setMaxValues(Math.min(6, pageSize));
+        .setMaxValues(maxValues);
     }
 
     const menu = createMenu(getPokemonForPage(currentPage));
