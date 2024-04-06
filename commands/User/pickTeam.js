@@ -55,7 +55,7 @@ module.exports = {
             .setCustomId('next_page')
             .setLabel('Next')
             .setStyle(ButtonStyle.Primary)
-            .setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize)); // Disable on last page
+            .setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize)); // Disable on last pag
 
         const row1 = new ActionRowBuilder().addComponents(menu);
         const row2 = new ActionRowBuilder().addComponents(previousButton, nextButton);
