@@ -68,7 +68,7 @@ function isCompletePokemon(newPokemon) {
   //if (pokemonData.species === undefined) undefinedFields.push('species');
   if (pokemonData.shiny === undefined || pokemonData.shiny.length == 0) undefinedFields.push('shiny');
   if (pokemonData.ability === undefined || pokemonData.ability.length == 0) undefinedFields.push('ability');
-  if (pokemonData.level == 0) undefinedFields.push('level');
+
   // if (pokemonData.evs === undefined || Object.keys(pokemonData.evs).length === 0) undefinedFields.push('evs');
   // if (pokemonData.nature === undefined) undefinedFields.push('nature');
   // if (pokemonData.ivs === undefined || Object.keys(pokemonData.ivs).length === 0) undefinedFields.push('ivs');
