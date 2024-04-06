@@ -68,58 +68,69 @@ module.exports = {
         const row2 = new ActionRowBuilder().addComponents(previousButton, nextButton, confirmButton)
 
 
-        await interaction.editReply({ content: 'Pick a Pokemon for your Team', components: [row1, row2] });
+        await interaction.editReply({
+            content: 'Pick a Pokemon for your Team',
+            components: [row1, row2], // Initially empty for efficiency
+        });
 
         const filter = (i) => i.user.id === userid;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
         let selectedPokemonIDs = [];
 
         collector.on('collect', async (i) => {
-          if (i.customId === 'team') {
-            selectedPokemonIDs = i.values; // Update selected IDs
-        
-            // Enable confirmation button if selections exist
-            const confirmButton = row2.components[2];
-            confirmButton.setDisabled(selectedPokemonIDs.length === 0);
-        
-            await interaction.editReply({ components: [row1, row2.setComponents(previousButton, nextButton, confirmButton)] });
-          } else if (i.customId === 'prev_page') {
-            currentPage--;
-            const updatedMenu = createMenu(getPokemonForPage(currentPage));
-            previousButton.setDisabled(currentPage === 1);
-            nextButton.setDisabled(false);
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
-          } else if (i.customId === 'next_page') {
-            currentPage++;
-            const updatedMenu = createMenu(getPokemonForPage(currentPage));
-            previousButton.setDisabled(false);
-            nextButton.setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize));
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton, nextButton)] });
-          } else if (i.customId === 'confirm_team') {
-            const newTeam = [];
-            for (const pokemonID of selectedPokemonIDs) {
-              const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID);
-              if (pokemon) {
-                newTeam.push(pokemon); // Add entire Pokemon object to team
-              } else {
-                console.error(`Pokemon with ID ${pokemonID} not found in user's Pokemon list.`);
-              }
+
+            if (i.customId === 'next_page' || i.customId === 'prev_page') {
+                currentPage = i.customId === 'next_page' ? currentPage + 1 : currentPage - 1;
+                const updatedMenu = createMenu(getPokemonForPage(currentPage));
+                row1.setComponents(updatedMenu); // Update menu in existing row1
+
+                // Update button states based on current page
+                previousButton.setDisabled(currentPage === 1);
+                nextButton.setDisabled(currentPage === Math.ceil(userPokemons.length / pageSize));
+
+                // Only recreate row2 if necessary (when confirm button state needs updating)
+                if (selectedPokemonIDs.length !== 0) {
+                    row2.setComponents(previousButton, nextButton, confirmButton.setDisabled(false));
+                }
+
+                await interaction.editReply({ components: [row1, row2] });
             }
-            
-            // Update user's team in MongoDB
-            await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
-            
-            // You might want to consider adding additional logic here to handle successful/unsuccessful updates (e.g., informing the user)
-            
-            await interaction.editReply("Your team has been updated!");
-            // Reset state for next selection
-            selectedPokemonIDs = []; // Clear selected IDs
-            currentPage = 1;
-            const updatedMenu = createMenu(getPokemonForPage(currentPage));
-            confirmButton.setDisabled(true); // Disable confirmation again
-            await interaction.editReply({ components: [row1.setComponents(updatedMenu), row2.setComponents(previousButton.setDisabled(true), nextButton, confirmButton)] });
-          }
+            else if (i.customId === 'team') {
+                // ... other code
+
+                // Enable confirmation button if selections exist
+                confirmButton.setDisabled(selectedPokemonIDs.length === 0);
+                row2.setComponents(previousButton, nextButton, confirmButton); // Update confirm button within existing row2
+                await interaction.editReply({ components: [row1, row2] });
+            }
+            else if (i.customId === 'confirm_team') {
+
+                const newTeam = [];
+                for (const pokemonID of selectedPokemonIDs) {
+                    const pokemon = userPokemons.find(pokemon => pokemon.id === pokemonID);
+                    if (pokemon) {
+                        newTeam.push(pokemon); // Add entire Pokemon object to team
+                    } else {
+                        console.error(`Pokemon with ID ${pokemonID} not found in user's Pokemon list.`);
+                    }
+                }
+
+                // Update user's team in MongoDB
+                await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
+
+
+                // Reset state for next selection
+                selectedPokemonIDs = [];
+                currentPage = 1;
+                const updatedMenu = createMenu(getPokemonForPage(currentPage));
+                row1.setComponents(updatedMenu);
+                confirmButton.setDisabled(true); // Disable confirmation again
+                // No need to recreate row2 here, just update components
+                row2.setComponents(previousButton.setDisabled(true), nextButton, confirmButton);
+                await interaction.editReply({ components: [row1, row2] });
+            }
+        }
         });
-        
-    }
+
+}
 }
