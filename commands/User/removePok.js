@@ -7,11 +7,6 @@ module.exports = {
         .setDescription('Removes a Pokemon from the User')
         .setDefaultMemberPermissions(0)
         .addStringOption(option => option
-            .setName('discordid')
-            .setDescription('The Discord ID of the User')
-            .setRequired(true)
-        )
-        .addStringOption(option => option
             .setName('pokemon')
             .setDescription('The Pokemon Name')
             .setRequired(true)
