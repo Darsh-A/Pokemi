@@ -67,7 +67,6 @@ module.exports = {
         const row1 = new ActionRowBuilder().addComponents(menu);
         const row2 = new ActionRowBuilder().addComponents(previousButton, nextButton, confirmButton)
 
-
         await interaction.editReply({ content: 'Pick a Pokemon for your Team', components: [row1, row2] });
 
         const filter = (i) => i.user.id === userid;
