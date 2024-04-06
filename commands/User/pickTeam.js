@@ -76,6 +76,7 @@ module.exports = {
                     if (!pokemon) return interaction.reply("Pokemon Not Found");
                     newTeam.push(pokemon);
                 }
+                
 
                 await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
                 interaction.editReply(`${pokemonIDs.length} Pokemon added to your team!`);
