@@ -144,6 +144,7 @@ module.exports = {
         // update users team
 
         user.Team = team;
+        
 
         await user.save();
 
