@@ -33,7 +33,7 @@ module.exports = {
           value: pokemon.id
         })))
         .setMinValues(1)
-        .setMaxValues(Math.min(pokemons.length, pageSize));
+        .setMaxValues(Math.min(pokemons.length, Math.min(pageSize, 6 - userTeam.length)))
     }
 
     const menu = createMenu(getPokemonForPage(currentPage));
@@ -69,6 +69,19 @@ module.exports = {
           if (!pokemon) return interaction.reply("Pokemon Not Found");
           newTeam.push(pokemon);
         }
+        if (i.customId === 'team') {
+            // Update selected Pokemon IDs (remove duplicates)
+            selectedPokemonIDs = [...new Set([...selectedPokemonIDs, ...i.values])];
+
+            if (selectedPokemonIDs.length > 6) {
+                // If more than 6 Pokemon are selected, limit to 6 and inform the user
+                selectedPokemonIDs = selectedPokemonIDs.slice(0, 6);
+                interaction.editReply(`You can only have a maximum of 6 Pokemon in your team. Selection limited to 6.`);
+              }
+              
+            confirmButton.setDisabled(selectedPokemonIDs.length === 0); // Enable confirm only if selections exist
+            await interaction.editReply({ components: [row1.setComponents(menu), row2.setComponents(previousButton, nextButton, confirmButton)] });
+          }
 
         await UserSchema.updateOne({ DiscordID: userid }, { Team: newTeam });
         interaction.editReply(`${pokemonIDs.length} Pokemon added to your team!`);
